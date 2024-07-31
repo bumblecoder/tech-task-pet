@@ -34,7 +34,7 @@ services:
     image: mysql:8.0.33
     environment:
       MYSQL_ROOT_PASSWORD: 'root_password'
-      MYSQL_DATABASE: 'test-test'
+      MYSQL_DATABASE: 'laravel_db'
       MYSQL_USER: 'laravel'
       MYSQL_PASSWORD: 'password'
     ports:
