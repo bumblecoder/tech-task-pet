@@ -8,6 +8,7 @@ use App\Models\Article;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
 final class ArticleController extends Controller
 {
@@ -29,7 +30,7 @@ final class ArticleController extends Controller
 
         $article = Article::create($validated);
 
-        return response()->json($article, 201);
+        return response()->json($article, Response::HTTP_CREATED);
     }
 
     public function show($id): JsonResponse
@@ -37,10 +38,10 @@ final class ArticleController extends Controller
         $article = Article::find($id);
 
         if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
+            return response()->json(['message' => 'Article not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return response()->json($article, 200);
+        return response()->json($article);
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -53,7 +54,7 @@ final class ArticleController extends Controller
         $article = Article::find($id);
 
         if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
+            return response()->json(['message' => 'Article not found'], Response::HTTP_NOT_FOUND);
         }
 
         $article->update($validated);
@@ -66,11 +67,11 @@ final class ArticleController extends Controller
         $article = Article::find($id);
 
         if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
+            return response()->json(['message' => 'Article not found'], Response::HTTP_NOT_FOUND);
         }
 
         $article->delete();
 
-        return response()->json(['message' => 'Article deleted successfully'], 200);
+        return response()->json(['message' => 'Article deleted successfully']);
     }
 }
