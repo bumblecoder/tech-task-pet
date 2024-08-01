@@ -75,6 +75,8 @@ The following API endpoints are available:
 - PUT|PATCH /api/articles/{id} — Update an article by ID
 - DELETE /api/articles/{id} — Delete an article by ID
 
+## Tests
+![image](https://github.com/user-attachments/assets/f4c96200-52b7-45de-b640-abe5d86ccaa3)
 
 
 <!-- LICENSE -->
