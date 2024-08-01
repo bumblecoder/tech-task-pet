@@ -31,6 +31,7 @@ Ensure you have Docker and Docker Compose installed on your machine.
    ```sh
    git clone https://github.com/bumblecoder/tech-task.git
    cd tech-task
+   cp code/.env.example code/.env
    ```
 2. Build and start the Docker containers:
    ```sh
