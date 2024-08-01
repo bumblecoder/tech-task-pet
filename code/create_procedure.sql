@@ -1,3 +1,5 @@
+USE laravel_db;
+
 DELIMITER //
 
 CREATE PROCEDURE GetArticleById(
