@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-bullseye
+FROM php:8.3-fpm-bullseye
 
 ARG APP_ENV
 ARG XDEBUG
@@ -9,8 +9,6 @@ ENV USER_ID=${USER_ID:-1000} \
     USERNAME="php"
     
 WORKDIR /code
-    
-RUN ln -snf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && echo America/Los_Angeles > /etc/timezone
 
 RUN apt-get update -qq --fix-missing \
     && apt-get install -qq -y --no-install-recommends \

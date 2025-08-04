@@ -12,7 +12,7 @@ services:
       - "./docker/php/config/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
     restart: always
     networks:
-      - tech-test-network
+      - docupet-test-network
 
   nginx:
     build:
@@ -21,35 +21,35 @@ services:
       args:
         - "APP_ENV=dev"
     ports:
-      - "80:80"
+      - "8088:80"
     volumes:
       - "./code/public:/code/public"
     depends_on:
       - php-fpm
     restart: always
     networks:
-      - tech-test-network
+      - docupet-test-network
 
   mysql:
     image: mysql:8.0.33
     environment:
       MYSQL_ROOT_PASSWORD: 'root_password'
-      MYSQL_DATABASE: 'laravel_db'
-      MYSQL_USER: 'laravel'
+      MYSQL_DATABASE: 'docupet_db'
+      MYSQL_USER: 'docupet'
       MYSQL_PASSWORD: 'password'
     ports:
-      - '33070:3306'
+      - '33077:3306'
     volumes:
       - mysql-data:/var/lib/mysql
     restart: always
     networks:
-      - tech-test-network
+      - docupet-test-network
 
   node:
     image: node:alpine
     working_dir: /srv/app
     ports:
-      - 8000:8000
+      - "8888:8000"
     entrypoint: /bin/sh
     volumes:
       - type: bind
@@ -57,10 +57,10 @@ services:
         target: /srv/app
     tty: true
     networks:
-      - tech-test-network
+      - docupet-test-network
 
 networks:
-  tech-test-network:
+  docupet-test-network:
     driver: bridge
 
 volumes:
