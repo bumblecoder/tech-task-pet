@@ -1,50 +1,46 @@
 FROM php:8.3-fpm-bullseye
 
-ARG APP_ENV
-ARG XDEBUG
-ARG USER_ID
-ARG GROUP_ID
-ENV USER_ID=${USER_ID:-1000} \
-    GROUP_ID=${GROUP_ID:-1000} \
-    USERNAME="php"
-    
+ARG APP_ENV=prod
+ARG XDEBUG=0
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
+ENV USER_ID=${USER_ID} \
+    GROUP_ID=${GROUP_ID} \
+    USERNAME=php
+
 WORKDIR /code
 
-RUN apt-get update -qq --fix-missing \
-    && apt-get install -qq -y --no-install-recommends \
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     default-mysql-client \
     libicu-dev \
     libzip-dev \
-    && docker-php-ext-configure intl \
-    && docker-php-ext-install mysqli pdo_mysql intl zip
+    unzip \
+    netcat \
+ && docker-php-ext-configure intl \
+ && docker-php-ext-install mysqli pdo_mysql intl zip \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN if [ "${APP_ENV}" = "dev" ] || [ "${APP_ENV}" = "test" ]; then \
-    pecl install xdebug && docker-php-ext-enable xdebug \
-;fi
+RUN if [ "$APP_ENV" = "dev" ] || [ "$APP_ENV" = "test" ]; then \
+    pecl install xdebug && docker-php-ext-enable xdebug ; \
+fi
 
 COPY --from=composer:2.5.4 /usr/bin/composer /usr/local/bin/composer
 
-COPY ./code /code
+COPY --chown=${USER_ID}:${GROUP_ID} ./code /code
 
-RUN composer install --no-scripts
+RUN composer install --no-scripts --no-interaction --no-progress
 
-# create custom user for php-fpm service
 RUN groupadd -g ${GROUP_ID} ${USERNAME} \
-    && useradd -l -u ${USER_ID} -g ${GROUP_ID} -m ${USERNAME} \
-    && chown --changes --silent --no-dereference --recursive ${USER_ID}:${GROUP_ID} \
-    /run \
-    /var/log \
-    /usr/local/lib \
+ && useradd -u ${USER_ID} -g ${GROUP_ID} -m -s /bin/bash ${USERNAME}
+
+RUN chown -R ${USER_ID}:${GROUP_ID} \
     /usr/local/etc \
     /usr/local/sbin/php-fpm \
-    /code \
-    /usr/local/bin/composer 2>&1 >/dev/null
+    /usr/local/bin/composer
 
 USER ${USERNAME}
 
-STOPSIGNAL SIGTERM
-
 EXPOSE 9000
-
-CMD ["/usr/local/sbin/php-fpm","--nodaemonize"]
-    
+STOPSIGNAL SIGTERM
+CMD ["php-fpm", "--nodaemonize"]

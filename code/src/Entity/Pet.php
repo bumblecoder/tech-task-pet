@@ -10,11 +10,13 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use App\Enum\Sex;
 use App\Repository\PetRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PetRepository::class)]
 class Pet
@@ -25,12 +27,15 @@ class Pet
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?Uuid $id = null;
 
+    #[Assert\NotBlank]
     #[ORM\Column(length: 55)]
     private ?string $name = null;
 
+    #[Assert\NotBlank]
     #[ORM\Column(length: 55)]
     private ?string $type = null;
 
+    #[Assert\NotBlank]
     #[ORM\Column(length: 55)]
     private ?string $breed = null;
 
@@ -40,6 +45,11 @@ class Pet
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     private ?int $approximateAge = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Choice(
+        callback: [Sex::class, 'values'],
+        message: 'Choose a valid sex.'
+    )]
     #[ORM\Column(length: 5)]
     private ?string $sex = null;
 
