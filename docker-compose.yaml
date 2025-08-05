@@ -52,8 +52,7 @@ services:
       - "8888:8000"
     command: >
       sh -c "npm install &&
-             npx tailwindcss init -p || true &&
-             npm run dev -- --watch"
+             npx tailwindcss -i ./assets/styles/app.css -o ./public/build/app.css --watch"
     volumes:
       - type: bind
         source: ./code
