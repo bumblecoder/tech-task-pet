@@ -63,9 +63,14 @@ class PetRegistrationType extends AbstractType
                 'multiple' => false,
                 'mapped' => false,
             ])
-            ->add('isDangerous', CheckboxType::class, [
-                'required' => false,
-                'mapped' => true,
+            ->add('isDangerous', ChoiceType::class, [
+                'choices' => [
+                    'No'  => false,
+                    'Yes' => true,
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'data' => false,
             ])
         ;
     }

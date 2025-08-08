@@ -38,7 +38,7 @@
                 {% set rounded = loop.first ? 'rounded-l' : (loop.last ? 'rounded-r' : '') %}
 
                 <div class="relative">
-                    {# ВАЖНО: без data-model на инпуте! Рендерим штатный radio от Symfony #}
+
                     {{ form_widget(child, { attr: { class: 'sr-only peer' } }) }}
 
                     {# По клику дергаем Live-экшен и передаём id (value радио) #}
@@ -253,6 +253,55 @@
         {% endif %}
     </fieldset>
     <br>
+    <fieldset>
+        <legend class="font-semibold text-gray-700 mb-2 text-sm">
+            Is the pet dangerous?
+        </legend>
+        <div class="flex max-w-xs">
+            <input
+                    type="radio"
+                    id="dangerous-no"
+                    name="{{ form.isDangerous.vars.full_name }}"
+                    value="0"
+                    class="hidden peer/dno"
+                    {% if form.isDangerous.vars.value is same as(false) or form.isDangerous.vars.value == 0 %}checked{% endif %}
+                    required
+            />
+            <label
+                    for="dangerous-no"
+                    class="cursor-pointer px-4 py-2 rounded-l border border-[color:#1D9BD0]
+             hover:border-[color:#1983b8]
+             peer-checked/dno:bg-[color:#1D9BD0]
+             peer-checked/dno:text-white
+             peer-checked/dno:border-[color:#1D9BD0]
+             transition"
+            >
+                No
+            </label>
+
+            <input
+                    type="radio"
+                    id="dangerous-yes"
+                    name="{{ form.isDangerous.vars.full_name }}"
+                    value="1"
+                    class="hidden peer/dyes"
+                    {% if form.isDangerous.vars.value is same as(true) or form.isDangerous.vars.value == 1 %}checked{% endif %}
+                    required
+            />
+            <label
+                    for="dangerous-yes"
+                    class="cursor-pointer px-4 py-2 rounded-r border border-[color:#1D9BD0]
+             hover:border-[color:#1983b8] border-l-0
+             peer-checked/dyes:bg-[color:#1D9BD0]
+             peer-checked/dyes:text-white
+             peer-checked/dyes:border-[color:#1D9BD0]
+             transition"
+            >
+                Yes
+            </label>
+        </div>
+        {{ form_errors(form.isDangerous) }}
+    </fieldset>
 
 
 
