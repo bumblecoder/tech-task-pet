@@ -36,35 +36,37 @@ class PetRegistrationType extends AbstractType
             ->add('breed', TextType::class, [
                 'label' => 'Breed',
                 'required' => false,
+            ])
+            ->add('sex', ChoiceType::class, [
+                'choices' => [
+                    'Female' => Sex::Female,
+                    'Male' => Sex::Male,
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'required' => true,
+            ])
+            ->add('dateOfBirth', DateType::class, [
+                'widget' => 'single_text',
+                'required' => false,
+                'html5' => false,
+                'input' => 'datetime_immutable',
+                'format' => 'yyyy-MM-dd',
+            ])
+            ->add('approximateAge', ChoiceType::class, [
+                'choices' => array_combine(range(1, 20), range(1, 20)),
+                'placeholder' => 'Select age',
+                'required' => false,
+            ])
+            ->add('dobKnown', ChoiceType::class, [
+                'choices' => [
+                    'No' => false,
+                    'Yes' => true,
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'mapped' => false,
             ]);
-//            ->add('sex', ChoiceType::class, [
-//                'choices' => [
-//                    'Male' => Sex::Male,
-//                    'Female' => Sex::Female,
-//                ],
-//                'expanded' => true,
-//                'multiple' => false,
-//                'label' => 'Sex',
-//            ])
-//            ->add('dateOfBirth', DateType::class, [
-//                'widget' => 'single_text',
-//                'required' => false,
-//                'label' => 'Date of Birth',
-//                'html5' => false,
-//            ])
-//            ->add('approximateAge', TextType::class, [
-//                'required' => false,
-//                'label' => 'Approximate Age',
-//            ])
-//            ->add('dobKnown', ChoiceType::class, [
-//                'choices' => [
-//                    'No' => false,
-//                    'Yes' => true,
-//                ],
-//                'expanded' => true,
-//                'multiple' => false,
-//                'mapped' => false,
-//            ]);
 
 //        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
 //            /** @var Pet $pet */

@@ -4,8 +4,7 @@
             'data-action': 'live#action:prevent',
             'data-live-action-param': 'save',
             'novalidate': 'novalidate'
-        }
-    }) }}
+         }}) }}
     <div class="flex justify-between items-end w-full mb-6 px-4">
         <i class="fas fa-paw text-green-500 text-xl rotate-90 translate-y-0"></i>
         <i class="fas fa-paw text-green-500 text-xl rotate-90 translate-y-2"></i>
@@ -111,125 +110,117 @@
                 {% endfor %}
             </div>
         {% endif %}
-
     </div>
+    <fieldset class="mt-4">
+        <legend class="font-semibold text-gray-700 mb-2 text-sm">
+            Do you know their date of birth?
+        </legend>
 
+        <div class="flex max-w-xs">
+            <div>
+                <input
+                        type="radio"
+                        id="dob-no"
+                        name="dob-known"
+                        value="0"
+                        class="hidden peer/dob-no"
+                        data-model="dobKnown"
+                        data-model-event="change"
+                        {% if this.dobKnown == false %}checked{% endif %}
+                />
+                <label
+                        for="dob-no"
+                        class="cursor-pointer px-4 py-2 rounded-l border border-[color:#1D9BD0]
+           hover:border-[color:#1983b8]
+           peer-checked/dob-no:bg-[color:#1D9BD0] peer-checked/dob-no:text-white
+           peer-checked/dob-no:border-[color:#1D9BD0] transition block"
+                >
+                    No
+                </label>
+            </div>
 
-    {#    <fieldset class="mt-4">#}
-{#        <legend class="font-semibold text-gray-700 mb-2 text-sm">#}
-{#            Do you know their date of birth?#}
-{#        </legend>#}
+            <div>
+                <input
+                        type="radio"
+                        id="dob-yes"
+                        name="dob-known"
+                        value="1"
+                        class="hidden peer/dob-yes"
+                        data-model="dobKnown"
+                        data-model-event="change"
+                        {% if this.dobKnown is same as(true) %}checked{% endif %}
+                />
+                <label
+                        for="dob-yes"
+                        class="cursor-pointer px-4 py-2 rounded-r border border-[color:#1D9BD0] border-l-0
+                       hover:border-[color:#1983b8]
+                       peer-checked/dob-yes:bg-[color:#1D9BD0] peer-checked/dob-yes:text-white
+                       peer-checked/dob-yes:border-[color:#1D9BD0] transition block"
+                >
+                    Yes
+                </label>
+            </div>
+        </div>
 
-{#        <div class="flex max-w-xs">#}
-{#            #}{# NO #}
-{#            <div>#}
-{#                <input#}
-{#                        type="radio"#}
-{#                        id="dob-no"#}
-{#                        name="dob-known"#}
-{#                        value="0"#}
-{#                        class="hidden peer"#}
-{#                        data-model="dobKnown"#}
-{#                        data-model-event="change"#}
-{#                        {% if not this.dobKnown %}checked{% endif %}#}
-{#                />#}
-{#                <label#}
-{#                        for="dob-no"#}
-{#                        class="cursor-pointer px-4 py-2 rounded-l border border-[color:#1D9BD0]#}
-{#               hover:border-[color:#1983b8]#}
-{#               peer-checked:bg-[color:#1D9BD0] peer-checked:text-white#}
-{#               peer-checked:border-[color:#1D9BD0] transition block"#}
-{#                >#}
-{#                    No#}
-{#                </label>#}
-{#            </div>#}
+        {% if this.dobKnown is same as(false) or this.dobKnown is empty %}
+            <div class="{{ this.dobKnown ? 'hidden' : 'mt-3' }}">
+                <label class="block mb-1 font-semibold text-gray-700 text-sm">Approximate Age</label>
+                {{ form_widget(form.approximateAge, {
+                    attr: {
+                        class: 'w-full max-w-xs border border-gray-300 bg-white rounded px-3 py-2 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]'
+                    }
+                }) }}
+                {{ form_errors(form.approximateAge) }}
+            </div>
+        {% endif %}
 
-{#            #}{# YES #}
-{#            <div>#}
-{#                <input#}
-{#                        type="radio"#}
-{#                        id="dob-yes"#}
-{#                        name="dob-known"#}
-{#                        value="1"#}
-{#                        class="hidden peer"#}
-{#                        data-model="dobKnown"#}
-{#                        data-model-event="change"#}
-{#                        {% if this.dobKnown %}checked{% endif %}#}
-{#                />#}
-{#                <label#}
-{#                        for="dob-yes"#}
-{#                        class="cursor-pointer px-4 py-2 rounded-r border border-[color:#1D9BD0] border-l-0#}
-{#               hover:border-[color:#1983b8]#}
-{#               peer-checked:bg-[color:#1D9BD0] peer-checked:text-white#}
-{#               peer-checked:border-[color:#1D9BD0] transition block"#}
-{#                >#}
-{#                    Yes#}
-{#                </label>#}
-{#            </div>#}
-{#        </div>#}
+        {{ form_widget(form.dateOfBirth, {
+            type: 'hidden',
+            attr: {
+                'data-model': 'form.dateOfBirth'
+            }
+        }) }}
 
-{#        #}{# Approximate Age (если ДР неизвестна) #}
-{#        {% if not this.dobKnown %}#}
-{#            <div class="mt-3">#}
-{#                <label for="approx-age" class="block mb-1 font-semibold text-gray-700 text-sm">#}
-{#                    Approximate Age#}
-{#                </label>#}
-{#                <select#}
-{#                        id="approx-age"#}
-{#                        name="approximateAge"#}
-{#                        data-model="approximateAge"#}
-{#                        class="w-full max-w-xs border border-gray-300 bg-white rounded px-3 py-2#}
-{#               hover:border-gray-400 focus:outline-none focus:ring-1#}
-{#               focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"#}
-{#                        required#}
-{#                >#}
-{#                    <option value="">Select age</option>#}
-{#                    {% for i in 1..20 %}#}
-{#                        <option value="{{ i }}" {% if this.approximateAge == i %}selected{% endif %}>{{ i }}</option>#}
-{#                    {% endfor %}#}
-{#                </select>#}
-{#            </div>#}
-{#        {% endif %}#}
+        {% if this.dobKnown is same as(true) %}
+            <div class="mt-3">
+                <label class="block font-semibold text-gray-700 text-sm mb-2">Birthdate</label>
+                <div class="flex gap-2">
+                    <div class="flex flex-col">
+                        <label class="text-gray-600 text-xs mb-1" for="dob-day">Day</label>
+                        <input
+                                id="dob-day" type="number" inputmode="numeric" min="1" max="31" placeholder="DD"
+                                class="w-20 border border-gray-300 rounded px-2 py-1
+                           hover:border-gray-400 focus:outline-none focus:ring-1
+                           focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
+                                data-model="dobDay" required
+                        />
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-gray-600 text-xs mb-1" for="dob-month">Month</label>
+                        <input
+                                id="dob-month" type="number" inputmode="numeric" min="1" max="12" placeholder="MM"
+                                class="w-20 border border-gray-300 rounded px-2 py-1
+                           hover:border-gray-400 focus:outline-none focus:ring-1
+                           focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
+                                data-model="dobMonth" required
+                        />
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-gray-600 text-xs mb-1" for="dob-year">Year</label>
+                        <input
+                                id="dob-year" type="number" inputmode="numeric" min="1900" max="{{ 'now'|date('Y') }}" placeholder="YYYY"
+                                class="w-28 border border-gray-300 rounded px-2 py-1
+                           hover:border-gray-400 focus:outline-none focus:ring-1
+                           focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
+                                data-model="dobYear" required
+                        />
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
-{#        #}{# Date of Birth (если ДР известна) #}
-{#        {% if this.dobKnown %}#}
-{#            <div class="mt-3">#}
-{#                <label class="block font-semibold text-gray-700 text-sm mb-2">Birthdate</label>#}
-{#                <div class="flex gap-2">#}
-{#                    <div class="flex flex-col">#}
-{#                        <label class="text-gray-600 text-xs mb-1" for="dob-day">Day</label>#}
-{#                        <input#}
-{#                                id="dob-day" type="number" inputmode="numeric" min="1" max="31" placeholder="DD"#}
-{#                                class="w-20 border border-gray-300 rounded px-2 py-1#}
-{#                   hover:border-gray-400 focus:outline-none focus:ring-1#}
-{#                   focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"#}
-{#                                data-model="dobDay" required#}
-{#                        />#}
-{#                    </div>#}
-{#                    <div class="flex flex-col">#}
-{#                        <label class="text-gray-600 text-xs mb-1" for="dob-month">Month</label>#}
-{#                        <input#}
-{#                                id="dob-month" type="number" inputmode="numeric" min="1" max="12" placeholder="MM"#}
-{#                                class="w-20 border border-gray-300 rounded px-2 py-1#}
-{#                   hover:border-gray-400 focus:outline-none focus:ring-1#}
-{#                   focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"#}
-{#                                data-model="dobMonth" required#}
-{#                        />#}
-{#                    </div>#}
-{#                    <div class="flex flex-col">#}
-{#                        <label class="text-gray-600 text-xs mb-1" for="dob-year">Year</label>#}
-{#                        <input#}
-{#                                id="dob-year" type="number" inputmode="numeric" min="1900" max="{{ 'now'|date('Y') }}" placeholder="YYYY"#}
-{#                                class="w-28 border border-gray-300 rounded px-2 py-1#}
-{#                   hover:border-gray-400 focus:outline-none focus:ring-1#}
-{#                   focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"#}
-{#                                data-model="dobYear" required#}
-{#                        />#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        {% endif %}#}
-{#    </fieldset>#}
+    </fieldset>
+
 
 
     <button
