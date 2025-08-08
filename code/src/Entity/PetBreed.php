@@ -25,9 +25,6 @@ class PetBreed
     #[ORM\JoinColumn(name: 'type', referencedColumnName: 'id', nullable: false)]
     private PetType $type;
 
-    #[ORM\Column(name: 'is_dangerous', type: 'boolean')]
-    private bool $isDangerous = false;
-
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -53,18 +50,6 @@ class PetBreed
     public function setType(PetType $type): self
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function isDangerous(): bool
-    {
-        return $this->isDangerous;
-    }
-
-    public function setIsDangerous(bool $value): self
-    {
-        $this->isDangerous = $value;
 
         return $this;
     }

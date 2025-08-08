@@ -5,7 +5,6 @@ namespace App\Twig\Components;
 use App\Entity\Pet;
 use App\Entity\PetBreed;
 use App\Entity\PetType;
-use App\Enum\Sex;
 use App\Form\PetRegistrationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -112,7 +111,6 @@ class PetRegistrationForm extends AbstractController
 
         /** @var Pet $pet */
         $pet = $this->getForm()->getData();
-        $pet->setSex(Sex::Male);
 
         if (!$pet->getBreed() && $this->breedId) {
             if ($breed = $this->em->getRepository(PetBreed::class)->find($this->breedId)) {
@@ -132,7 +130,7 @@ class PetRegistrationForm extends AbstractController
         } else {
             $pet->setDateOfBirth(null);
         }
-        dd($pet);
+
         $this->em->persist($pet);
         $this->em->flush();
 

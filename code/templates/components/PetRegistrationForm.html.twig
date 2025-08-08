@@ -111,6 +111,39 @@
             </div>
         {% endif %}
     </div>
+    <br>
+    <fieldset class="mb-4">
+        <legend class="font-semibold text-gray-700 mb-2 text-sm">
+            What gender are they?
+        </legend>
+
+        <div class="flex max-w-xs">
+            {% for child in form.sex %}
+                {% set rounded = loop.first ? 'rounded-l' : (loop.last ? 'rounded-r' : '') %}
+
+                <div>
+                    {# Радио из формы: правильное name/value/id; скрываем визуально, оставляем как peer #}
+                    {{ form_widget(child, { attr: { class: 'sr-only peer' } }) }}
+
+                    {# Лейбл-«таб» сразу после input — peer-checked сработает надёжно #}
+                    <label
+                            for="{{ child.vars.id }}"
+                            class="cursor-pointer px-4 py-2 {{ rounded }}
+                 border border-[color:#1D9BD0] hover:border-[color:#1983b8]
+                 {{ not loop.first ? 'border-l-0' : '' }}
+                 peer-checked:bg-[color:#1D9BD0]
+                 peer-checked:text-white
+                 peer-checked:border-[color:#1D9BD0]
+                 block transition"
+                    >
+                        {{ child.vars.label }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        {{ form_errors(form.sex) }}
+    </fieldset>
     <fieldset class="mt-4">
         <legend class="font-semibold text-gray-700 mb-2 text-sm">
             Do you know their date of birth?
@@ -218,8 +251,9 @@
                 </div>
             </div>
         {% endif %}
-
     </fieldset>
+    <br>
+
 
 
 

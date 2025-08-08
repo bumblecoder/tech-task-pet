@@ -48,6 +48,9 @@ class Pet
     #[ORM\Column(name: 'sex', length: 10, enumType: Sex::class)]
     private Sex $sex;
 
+    #[ORM\Column(name: 'is_dangerous', type: 'boolean')]
+    private bool $isDangerous = false;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -121,6 +124,18 @@ class Pet
     public function setSex(Sex $sex): self
     {
         $this->sex = $sex;
+
+        return $this;
+    }
+
+    public function isDangerous(): bool
+    {
+        return $this->isDangerous;
+    }
+
+    public function setIsDangerous(bool $value): self
+    {
+        $this->isDangerous = $value;
 
         return $this;
     }
