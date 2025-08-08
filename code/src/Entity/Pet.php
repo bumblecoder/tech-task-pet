@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PetRepository::class)]
 class Pet
@@ -20,20 +21,28 @@ class Pet
     private ?Uuid $id = null;
 
     #[ORM\Column(name: 'name', type: 'string', length: 55)]
-    private string $name;
+    #[Assert\NotBlank(message: 'Please enter a name for your pet.')]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: 'The name must be at least {{ limit }} characters long.',
+        maxMessage: 'The name cannot be longer than {{ limit }} characters.'
+    )]
+    private ?string $name = null;
 
     #[ORM\ManyToOne(targetEntity: PetType::class)]
     #[ORM\JoinColumn(name: 'type', referencedColumnName: 'id', nullable: false)]
+    #[Assert\NotNull(message: 'Please select a type for your pet.')]
     private PetType $type;
 
     #[ORM\ManyToOne(targetEntity: PetBreed::class)]
     #[ORM\JoinColumn(name: 'breed', referencedColumnName: 'id', nullable: false)]
-    private PetBreed $breed;
+    private ?PetBreed $breed = null;
 
     #[ORM\Column(name: 'date_of_birth', type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $dateOfBirth = null;
 
-    #[ORM\Column(name: 'approximate_age', type: 'boolean', nullable: true)]
+    #[ORM\Column(name: 'approximate_age', type: 'integer', nullable: true)]
     private ?int $approximateAge = null;
 
     #[ORM\Column(name: 'sex', length: 10, enumType: Sex::class)]
@@ -44,7 +53,7 @@ class Pet
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -68,7 +77,7 @@ class Pet
         return $this;
     }
 
-    public function getBreed(): PetBreed
+    public function getBreed(): ?PetBreed
     {
         return $this->breed;
     }

@@ -1,0 +1,114 @@
+<div {{ attributes }} class="bg-white p-6 rounded-lg shadow max-w-md w-full space-y-4 mx-auto px-4">
+    {{ form_start(form, {
+        attr: {
+            'data-action': 'live#action:prevent',
+            'data-live-action-param': 'save',
+            'novalidate': 'novalidate'
+        }
+    }) }}
+    <div class="flex justify-between items-end w-full mb-6 px-4">
+        <i class="fas fa-paw text-green-500 text-xl rotate-90 translate-y-0"></i>
+        <i class="fas fa-paw text-green-500 text-xl rotate-90 translate-y-2"></i>
+        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
+        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-2"></i>
+        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
+        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-2"></i>
+        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
+    </div>
+    <h1 class="text-2xl font-medium text-blue-900 mb-6 text-left">
+        Tell us about your pet
+    </h1>
+    <div>
+        {{ form_label(form.name, 'Pet’s name', {
+            label_attr: {'class': 'block mb-1 font-semibold text-sm text-gray-700'}
+        }) }}
+        {{ form_widget(form.name, {
+            attr: {
+                class: 'w-full border border-gray-300 rounded px-3 py-2 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]',
+                placeholder: 'Enter your pet\'s name'
+            }
+        }) }}
+        {{ form_errors(form.name) }}
+    </div>
+    <br>
+    <fieldset>
+        <legend class="font-semibold text-gray-700 mb-2 text-sm">Pet type</legend>
+        <div class="flex max-w-xs">
+            {% for choice in form.type.vars.choices %}
+                {% set id = form.type.vars.id ~ '_' ~ loop.index %}
+                {% set name = form.type.vars.full_name %}
+                {% set label = choice.label %}
+                {% set value = choice.value %}
+                {% set isChecked = (form.type.vars.value == value) ? 'checked' : '' %}
+                {% set rounded = loop.first ? 'rounded-l' : (loop.last ? 'rounded-r' : '') %}
+                <div class="peer">
+                    <input
+                        type="radio"
+                        id="{{ id }}"
+                        name="{{ name }}"
+                        value="{{ value }}"
+                        {{ isChecked }}
+                        class="hidden peer"
+                        data-model="type"
+                    />
+                    <label
+                            for="{{ id }}"
+                            class="cursor-pointer px-4 py-2 {{ rounded }}
+                        border border-[color:#1D9BD0]
+                        hover:border-[color:#1983b8]
+                        {{ not loop.first ? 'border-l-0' : '' }}
+                        peer-checked:bg-[color:#1D9BD0]
+                        peer-checked:text-white
+                        peer-checked:border-[color:#1D9BD0]
+                        transition"
+                    >
+                        {{ label }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+        {% if form_errors(form.type) %}
+            <p class="text-red-600 text-sm mt-1">{{ form_errors(form.type) }}</p>
+        {% endif %}
+    </fieldset>
+    <br>
+
+    <div class="relative">
+        <label
+                for="breed"
+                class="block mb-1 font-semibold text-sm text-gray-700"
+        >
+            What breed are they?
+        </label>
+        <input
+                type="search"
+                class="w-full border border-gray-300 rounded px-3 py-2"
+                placeholder="Can't find it?"
+                data-model="debounce(10000)|breedSearch"
+                data-action="input->live#action"
+                data-live-action-param="searchBreeds"
+                autocomplete="off"
+        />
+
+        {% if filteredBreeds is defined and filteredBreeds is not empty %}
+            <div class="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded shadow">
+                {% for breed in filteredBreeds %}
+                    <button
+                            type="button"
+                            class="w-full text-left px-4 py-2 hover:bg-gray-100"
+                            data-action="click->live#action"
+                            data-live-action-param="setBreed"
+                            data-live-breed-param="{{ breed }}"
+                    >
+                        {{ breed }}
+                    </button>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <button
+            type="submit"
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+        Save Pet
+    </button>
+</div>

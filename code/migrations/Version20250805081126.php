@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250805063906 extends AbstractMigration
+final class Version20250805081126 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,7 +20,7 @@ final class Version20250805063906 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE pet (id BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', type BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', breed BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', name VARCHAR(55) NOT NULL, date_of_birth DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', approximate_age TINYINT(1) DEFAULT NULL, sex VARCHAR(10) NOT NULL, INDEX IDX_E4529B858CDE5729 (type), INDEX IDX_E4529B85F8AF884F (breed), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE pet (id BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', type BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', breed BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', name VARCHAR(55) NOT NULL, date_of_birth DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', approximate_age INT DEFAULT NULL, sex VARCHAR(10) NOT NULL, INDEX IDX_E4529B858CDE5729 (type), INDEX IDX_E4529B85F8AF884F (breed), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE pet_breed (id BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', type BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', name VARCHAR(55) NOT NULL, is_dangerous TINYINT(1) NOT NULL, INDEX IDX_55D348EC8CDE5729 (type), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE pet_type (id BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', name VARCHAR(55) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE pet ADD CONSTRAINT FK_E4529B858CDE5729 FOREIGN KEY (type) REFERENCES pet_type (id)');

@@ -22,8 +22,8 @@ composer: ## Install/update/delete composer libraries
 down: ## Shut down project but keep mysql db data
 	@echo "🛑 Shutting down the project..."
 	$(DOCKER_COMPOSE) down --remove-orphans
-tailwind: ## Compile Tailwind CSS
-	@echo "🎨 Compiling Tailwind CSS..."
-	$(DOCKER_COMPOSE) exec node npx tailwindcss -i ./assets/styles/app.css -o ./public/build/app.css
+#tailwind: ## Compile Tailwind CSS
+#	@echo "🎨 Compiling Tailwind CSS..."
+#	$(DOCKER_COMPOSE) exec node npx tailwindcss -i ./assets/styles/app.css -o ./public/build/app.css
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

@@ -45,21 +45,21 @@ services:
     networks:
       - docupet-test-network
 
-  node:
-    image: node:alpine
-    working_dir: /srv/app
-    ports:
-      - "8888:8000"
-    command: >
-      sh -c "npm install &&
-             npx tailwindcss -i ./assets/styles/app.css -o ./public/build/app.css --watch"
-    volumes:
-      - type: bind
-        source: ./code
-        target: /srv/app
-    tty: true
-    networks:
-      - docupet-test-network
+#  node:
+#    image: node:alpine
+#    working_dir: /srv/app
+#    ports:
+#      - "8888:8000"
+#    command: >
+#      sh -c "npm install &&
+#             npx tailwindcss -i ./assets/styles/app.css -o ./public/build/app.css --watch"
+#    volumes:
+#      - type: bind
+#        source: ./code
+#        target: /srv/app
+#    tty: true
+#    networks:
+#      - docupet-test-network
 
 networks:
   docupet-test-network:

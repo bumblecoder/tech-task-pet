@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PetBreed;
+use App\Entity\PetType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,15 @@ class PetBreedRepository extends ServiceEntityRepository
         parent::__construct($registry, PetBreed::class);
     }
 
-    //    /**
-    //     * @return PetBreed[] Returns an array of PetBreed objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findBySearch(PetType $type, string $search): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->where('b.type = :type')
+            ->andWhere('LOWER(b.name) LIKE :search')
+            ->setParameter('type', $type->getId(), 'uuid')
+            ->setParameter('search', '%' . strtolower($search) . '%')
+            ->setMaxResults(10);
 
-    //    public function findOneBySomeField($value): ?PetBreed
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $qb->getQuery()->getResult();
+    }
 }
