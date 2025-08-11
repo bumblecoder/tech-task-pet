@@ -64,9 +64,19 @@ class PetRegistrationForm extends AbstractController
     #[LiveProp(writable: true)]
     public ?string $selectedBreedName = null;
 
+    private bool $disableSubmitOnRender = false;
+
+    #[LiveProp(writable: true)]
+    public bool $userSubmit = false;
+
     protected function instantiateForm(): FormInterface
     {
-        return $this->createForm(PetRegistrationType::class, $this->data);
+        return $this->createForm(PetRegistrationType::class, new Pet());
+    }
+
+    public function shouldSubmitFormOnRender(): bool
+    {
+        return !$this->disableSubmitOnRender;
     }
 
     #[LiveAction]
@@ -117,7 +127,6 @@ class PetRegistrationForm extends AbstractController
         }
     }
 
-
     #[LiveAction]
     public function setBreed(#[LiveArg('id')] string $id): void
     {
@@ -134,17 +143,24 @@ class PetRegistrationForm extends AbstractController
     }
 
     #[LiveAction]
-    public function save()
+    public function save(): void
     {
+        $this->userSubmit = true;
         $this->submitForm();
 
-        /** @var Pet $pet */
-        $pet = $this->getForm()->getData();
+        $form = $this->getForm();
+
+        /** @var Pet|null $pet */
+        $pet = $form->getData();
+        if (!$pet instanceof Pet) {
+            $form->addError(new FormError('Form data is not bound to Pet.'));
+            return;
+        }
 
         if ($this->breedId) {
             $breed = $this->em->getRepository(PetBreed::class)->find($this->breedId);
             if (!$breed) {
-                $this->getForm()->addError(new FormError('Selected breed is invalid.'));
+                $form->addError(new FormError('Selected breed is invalid.'));
                 return;
             }
             $pet->setBreed($breed);
@@ -152,13 +168,16 @@ class PetRegistrationForm extends AbstractController
         } else {
             $pet->setBreed(null);
 
-            if ($this->breedChoice === 'mix') {
-                $mix = trim((string) $this->breedMixText);
-                if ($mix === '') {
-                    $this->getForm()->addError(new FormError('Please describe the mix breed.'));
+            $choice = $form->has('breedChoice') ? $form->get('breedChoice')->getData() : null; // 'unknown' | 'mix' | null
+            $mixTxt = $form->has('breedOther') ? (string) $form->get('breedOther')->getData() : '';
+
+            if ($choice === 'mix') {
+                $mixTxt = trim($mixTxt);
+                if ($mixTxt == '') {
+                    $form->addError(new FormError('Please describe the mix breed.'));
                     return;
                 }
-                $pet->setBreedOther($mix);
+                $pet->setBreedOther($mixTxt);
             } else {
                 $pet->setBreedOther(null);
             }
@@ -168,10 +187,9 @@ class PetRegistrationForm extends AbstractController
             $date = null;
             if ($this->dobYear && $this->dobMonth && $this->dobDay) {
                 try {
-                    $date = new \DateTimeImmutable(
-                        sprintf('%04d-%02d-%02d', $this->dobYear, $this->dobMonth, $this->dobDay)
-                    );
-                } catch (\Throwable) {}
+                    $date = new \DateTimeImmutable(sprintf('%04d-%02d-%02d', $this->dobYear, $this->dobMonth, $this->dobDay));
+                } catch (\Throwable) {
+                }
             }
             $pet->setDateOfBirth($date);
             $pet->setApproximateAge(null);
@@ -179,14 +197,19 @@ class PetRegistrationForm extends AbstractController
             $pet->setDateOfBirth(null);
         }
 
-        if (!$this->getForm()->isValid()) {
+        if (!$form->isValid()) {
             return;
         }
 
         $this->em->persist($pet);
         $this->em->flush();
 
-        return null;
+        $this->resetForm();
+
+        $this->userSubmit   = false;
+        $this->breedId      = null;
+        $this->breedSearch  = '';
+        $this->dobYear = $this->dobMonth = $this->dobDay = null;
     }
 
     #[LiveAction]

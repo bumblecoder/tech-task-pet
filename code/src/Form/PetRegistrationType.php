@@ -7,7 +7,6 @@ use App\Entity\PetType;
 use App\Enum\Sex;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -47,9 +46,7 @@ class PetRegistrationType extends AbstractType
                 'multiple' => false,
                 'mapped'   => false,
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please choose one option.',
-                    ]),
+                    new NotBlank(message: 'Please choose one option.'),
                 ],
             ])
             ->add('sex', ChoiceType::class, [

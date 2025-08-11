@@ -73,7 +73,9 @@
     </fieldset>
 
     <div class="relative mt-4">
-        <label for="breed-search" class="block mb-1 font-semibold text-sm text-gray-700">What breed are they?</label>
+        <label for="breed-search" class="block mb-1 font-semibold text-sm text-gray-700">
+            What breed are they?
+        </label>
 
         <input
                 id="breed-search"
@@ -88,7 +90,6 @@
         />
 
         <input type="hidden" name="{{ form.breed.vars.full_name }}" value="{{ this.breedId ?? '' }}">
-        <input type="hidden" name="{{ form.breedOther.vars.full_name }}" value="{{ this.breedChoice == 'mix' ? (this.breedMixText ?? '') : '' }}">
 
         {% if filteredBreeds is defined and filteredBreeds is not empty %}
             <div class="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded shadow max-h-64 overflow-auto">
@@ -105,44 +106,66 @@
             </div>
         {% endif %}
 
-        {% set typeSelected = (this.type is not null) or (form.type.vars.data is not null) %}
-        {% set canShowManual = typeSelected and (this.breedSearch is not empty)
-            and (filteredBreeds is defined) and (filteredBreeds is empty)
-            and (this.breedId is empty) %}
+        {% set noBreedChosen = this.breedId is empty %}
+        {% set searchEmpty   = this.breedSearch is empty %}
+        {% set noResults     = (filteredBreeds is defined and filteredBreeds is empty) %}
+        {% set currentChoice = pet_registration.breedChoice ?? form.breedChoice.vars.data %}
+        {% set showBreedError = this.userSubmit and noBreedChosen and (searchEmpty or noResults) %}
 
-        {% if canShowManual %}
+        {% if showBreedError %}
+            <div class="text-sm text-red-600 mt-1">
+                We couldn't find this breed. Please choose an option below.
+            </div>
+        {% endif %}
+
+        {% set showBreedChoice = (this.userSubmit and noBreedChosen and (searchEmpty or noResults))
+            or (noBreedChosen and (not searchEmpty) and noResults) %}
+
+        {% if showBreedChoice %}
             <fieldset class="mt-3">
                 <legend class="font-semibold text-gray-700 mb-1 text-sm">Choose One</legend>
 
                 <div class="flex items-center gap-6 text-sm text-gray-800">
                     <label class="inline-flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="breed-choice" value="unknown"
-                               class="h-4 w-4 cursor-pointer [appearance:auto] [-webkit-appearance:auto] [accent-color:#1D9BD0]"
-                               data-model="breedChoice" data-model-event="change"
-                               {% if this.breedChoice == 'unknown' %}checked{% endif %}/>
+                        <input
+                                type="radio"
+                                name="{{ form.breedChoice.vars.full_name }}"
+                                value="unknown"
+                                class="h-4 w-4 cursor-pointer [appearance:auto] [-webkit-appearance:auto] [accent-color:#1D9BD0]"
+                                data-model="on(change)|pet_registration.breedChoice"
+                                {{ currentChoice == 'unknown' ? 'checked' : '' }}
+                        />
                         <span>I don't know</span>
                     </label>
 
                     <label class="inline-flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="breed-choice" value="mix"
-                               class="h-4 w-4 cursor-pointer [appearance:auto] [-webkit-appearance:auto] [accent-color:#1D9BD0]"
-                               data-model="breedChoice" data-model-event="change"
-                               {% if this.breedChoice == 'mix' %}checked{% endif %}/>
+                        <input
+                                type="radio"
+                                name="{{ form.breedChoice.vars.full_name }}"
+                                value="mix"
+                                class="h-4 w-4 cursor-pointer [appearance:auto] [-webkit-appearance:auto] [accent-color:#1D9BD0]"
+                                data-model="on(change)|pet_registration.breedChoice"
+                                {{ currentChoice == 'mix' ? 'checked' : '' }}
+                        />
                         <span>It is a mix</span>
                     </label>
                 </div>
-                <div class="form-error-message">
+
+                <div class="form-error-message {{ (this.userSubmit and (currentChoice is empty)) ? '' : 'hidden' }}">
                     {{ form_errors(form.breedChoice) }}
                 </div>
 
-                <div class="mt-2 {{ this.breedChoice == 'mix' ? '' : 'hidden' }}">
+                <div class="mt-2 {{ (currentChoice == 'mix') ? '' : 'hidden' }}">
                     <label class="block mb-1 font-semibold text-sm text-gray-700">Please specify the mix breed</label>
-                    <input type="text"
-                           class="{{ ui.input_class(false) }}"
-                           placeholder="Describe the mix"
-                           data-model="breedMixText"
-                           autocomplete="off"
-                           value="{{ this.breedMixText ?? '' }}"/>
+                    <input
+                            type="text"
+                            name="{{ form.breedOther.vars.full_name }}"
+                            class="{{ ui.input_class(false) }}"
+                            placeholder="Describe the mix"
+                            data-model="on(change)|pet_registration.breedOther"
+                            autocomplete="off"
+                            value="{{ pet_registration.breedOther ?? form.breedOther.vars.data ?? '' }}"
+                    />
                 </div>
             </fieldset>
         {% endif %}
