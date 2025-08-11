@@ -1,10 +1,17 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is a part of Anton Bielykh's test Application.
+ *
+ * Copyright © 2025 All rights reserved
+ */
+
 namespace App\Entity;
 
 use App\Enum\Sex;
 use App\Repository\PetRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -43,7 +50,7 @@ class Pet
     private ?string $breedOther = null;
 
     #[ORM\Column(name: 'date_of_birth', type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $dateOfBirth = null;
+    private ?\DateTimeImmutable $dateOfBirth = null;
 
     #[ORM\Column(name: 'approximate_age', type: 'integer', nullable: true)]
     private ?int $approximateAge = null;
@@ -108,12 +115,12 @@ class Pet
         return $this;
     }
 
-    public function getDateOfBirth(): ?DateTimeImmutable
+    public function getDateOfBirth(): ?\DateTimeImmutable
     {
         return $this->dateOfBirth;
     }
 
-    public function setDateOfBirth(?DateTimeImmutable $dateOfBirth): self
+    public function setDateOfBirth(?\DateTimeImmutable $dateOfBirth): self
     {
         $this->dateOfBirth = $dateOfBirth;
 

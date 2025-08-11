@@ -1,5 +1,13 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is a part of Anton Bielykh's test Application.
+ *
+ * Copyright © 2025 All rights reserved
+ */
+
 namespace App\Twig\Components;
 
 use App\Entity\Pet;
@@ -23,7 +31,9 @@ class PetRegistrationForm extends AbstractController
     use ComponentWithFormTrait;
     use DefaultActionTrait;
 
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em)
+    {
+    }
 
     #[LiveProp(writable: true)]
     public ?Pet $data = null;
@@ -117,13 +127,14 @@ class PetRegistrationForm extends AbstractController
             $this->filteredBreeds = [];
             $this->breedChoice = null;
             $this->breedMixText = null;
+
             return;
         }
 
         $breeds = $this->em->getRepository(PetBreed::class)->findBySearch($type, $this->breedSearch);
 
         $this->filteredBreeds = array_map(
-            fn(PetBreed $b) => ['id'=>(string)$b->getId(),'name'=>$b->getName()],
+            fn (PetBreed $b) => ['id' => (string) $b->getId(), 'name' => $b->getName()],
             $breeds ?? []
         );
 
@@ -160,6 +171,7 @@ class PetRegistrationForm extends AbstractController
         $pet = $form->getData();
         if (!$pet instanceof Pet) {
             $form->addError(new FormError('Form data is not bound to Pet.'));
+
             return;
         }
 
@@ -167,6 +179,7 @@ class PetRegistrationForm extends AbstractController
             $breed = $this->em->getRepository(PetBreed::class)->find($this->breedId);
             if (!$breed) {
                 $form->addError(new FormError('Selected breed is invalid.'));
+
                 return;
             }
             $pet->setBreed($breed);
@@ -174,17 +187,19 @@ class PetRegistrationForm extends AbstractController
         } else {
             $pet->setBreed(null);
 
-            $choice  = $form->has('breedChoice') ? $form->get('breedChoice')->getData() : null; // 'unknown'|'mix'|null
-            $mixText = $form->has('breedOther')  ? trim((string) $form->get('breedOther')->getData()) : '';
+            $choice = $form->has('breedChoice') ? $form->get('breedChoice')->getData() : null; // 'unknown'|'mix'|null
+            $mixText = $form->has('breedOther') ? trim((string) $form->get('breedOther')->getData()) : '';
 
-            if ($choice === null || $choice === '') {
+            if (null === $choice || '' === $choice) {
                 $form->get('breedChoice')->addError(new FormError('Please choose one option.'));
+
                 return;
             }
 
-            if ($choice === 'mix') {
-                if ($mixText === '') {
+            if ('mix' === $choice) {
+                if ('' === $mixText) {
                     $form->get('breedOther')->addError(new FormError('Please specify the mix breed.'));
+
                     return;
                 }
                 $pet->setBreedOther($mixText);
@@ -215,16 +230,16 @@ class PetRegistrationForm extends AbstractController
         $this->em->flush();
 
         $this->summary = [
-            'name'      => $pet->getName() ?: '—',
-            'type'      => $pet->getType()?->getName() ?: '—',
-            'breed'     => $pet->getBreed()?->getName()
+            'name' => $pet->getName() ?: '—',
+            'type' => $pet->getType()?->getName() ?: '—',
+            'breed' => $pet->getBreed()?->getName()
                 ?? ($pet->getBreedOther() ? 'Mix' : 'Unknown'),
-            'mix'       => $pet->getBreedOther() ? 'Yes' : 'No',
-            'mixText'   => $pet->getBreedOther() ?: null,
-            'gender'    => $pet->getSex()?->name ?? '—',
-            'ageOrDob'  => $pet->getDateOfBirth()
+            'mix' => $pet->getBreedOther() ? 'Yes' : 'No',
+            'mixText' => $pet->getBreedOther() ?: null,
+            'gender' => $pet->getSex()?->name ?? '—',
+            'ageOrDob' => $pet->getDateOfBirth()
                 ? $pet->getDateOfBirth()->format('Y-m-d')
-                : ($pet->getApproximateAge() ? ('~'.$pet->getApproximateAge().' years') : '—'),
+                : ($pet->getApproximateAge() ? ('~' . $pet->getApproximateAge() . ' years') : '—'),
             'dangerous' => $pet->isDangerous(),
         ];
 
@@ -233,9 +248,9 @@ class PetRegistrationForm extends AbstractController
 
         $this->resetForm();
 
-        $this->userSubmit   = false;
-        $this->breedId      = null;
-        $this->breedSearch  = '';
+        $this->userSubmit = false;
+        $this->breedId = null;
+        $this->breedSearch = '';
         $this->dobYear = $this->dobMonth = $this->dobDay = null;
     }
 

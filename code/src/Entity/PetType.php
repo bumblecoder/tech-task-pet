@@ -1,9 +1,16 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is a part of Anton Bielykh's test Application.
+ *
+ * Copyright © 2025 All rights reserved
+ */
+
 namespace App\Entity;
 
 use App\Repository\PetTypeRepository;
-use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;

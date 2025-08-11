@@ -1,5 +1,13 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is a part of Anton Bielykh's test Application.
+ *
+ * Copyright © 2025 All rights reserved
+ */
+
 namespace App\Form;
 
 use App\Entity\Pet;
@@ -24,10 +32,10 @@ class PetRegistrationType extends AbstractType
                 'label' => 'Pet’s Name',
             ])
             ->add('type', EntityType::class, [
-                'class'        => PetType::class,
+                'class' => PetType::class,
                 'choice_label' => 'name',
-                'expanded'     => true,
-                'multiple'     => false,
+                'expanded' => true,
+                'multiple' => false,
             ])
             ->add('breed', HiddenType::class, [
                 'mapped' => false,
@@ -39,11 +47,11 @@ class PetRegistrationType extends AbstractType
             ->add('breedChoice', ChoiceType::class, [
                 'choices' => [
                     "I don't know" => 'unknown',
-                    "It is a mix"  => 'mix',
+                    'It is a mix' => 'mix',
                 ],
                 'expanded' => true,
                 'multiple' => false,
-                'mapped'   => false,
+                'mapped' => false,
             ])
             ->add('sex', ChoiceType::class, [
                 'choices' => [
@@ -77,14 +85,13 @@ class PetRegistrationType extends AbstractType
             ])
             ->add('isDangerous', ChoiceType::class, [
                 'choices' => [
-                    'No'  => false,
+                    'No' => false,
                     'Yes' => true,
                 ],
                 'expanded' => true,
                 'multiple' => false,
                 'data' => false,
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
