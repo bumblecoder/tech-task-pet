@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Enum\Sex;
 use App\Repository\PetRepository;
 use DateTimeImmutable;
-use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -36,8 +35,12 @@ class Pet
     private PetType $type;
 
     #[ORM\ManyToOne(targetEntity: PetBreed::class)]
-    #[ORM\JoinColumn(name: 'breed', referencedColumnName: 'id', nullable: false)]
+    #[ORM\JoinColumn(name: 'breed', referencedColumnName: 'id', nullable: true)]
     private ?PetBreed $breed = null;
+
+    #[ORM\Column(name: 'breed_other', type: 'string', length: 120, nullable: true)]
+    #[Assert\Length(max: 120)]
+    private ?string $breedOther = null;
 
     #[ORM\Column(name: 'date_of_birth', type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $dateOfBirth = null;
@@ -46,6 +49,7 @@ class Pet
     private ?int $approximateAge = null;
 
     #[ORM\Column(name: 'sex', length: 10, enumType: Sex::class)]
+    #[Assert\NotNull(message: 'Please select a gender for your pet.')]
     private Sex $sex;
 
     #[ORM\Column(name: 'is_dangerous', type: 'boolean')]
@@ -85,9 +89,21 @@ class Pet
         return $this->breed;
     }
 
-    public function setBreed(PetBreed $breed): self
+    public function setBreed(?PetBreed $breed): self
     {
         $this->breed = $breed;
+
+        return $this;
+    }
+
+    public function getBreedOther(): ?string
+    {
+        return $this->breedOther;
+    }
+
+    public function setBreedOther(?string $breedOther): self
+    {
+        $this->breedOther = $breedOther ? trim($breedOther) : null;
 
         return $this;
     }

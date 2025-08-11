@@ -8,6 +8,7 @@ use App\Entity\PetType;
 use App\Form\PetRegistrationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -54,6 +55,15 @@ class PetRegistrationForm extends AbstractController
     #[LiveProp(writable: true)]
     public ?int $dobYear = null;
 
+    #[LiveProp(writable: true)]
+    public ?string $breedChoice = null;
+
+    #[LiveProp(writable: true)]
+    public ?string $breedMixText = null;
+
+    #[LiveProp(writable: true)]
+    public ?string $selectedBreedName = null;
+
     protected function instantiateForm(): FormInterface
     {
         return $this->createForm(PetRegistrationType::class, $this->data);
@@ -70,23 +80,43 @@ class PetRegistrationForm extends AbstractController
         $this->breedId = null;
         $this->breedSearch = null;
         $this->filteredBreeds = [];
+
+        $this->breedChoice = null;
+        $this->breedMixText = null;
     }
 
     #[LiveAction]
     public function searchBreeds(): void
     {
+        if ($this->breedId && $this->breedSearch !== $this->selectedBreedName) {
+            $this->breedId = null;
+            $this->selectedBreedName = null;
+            $this->breedChoice = null;
+            $this->breedMixText = null;
+        }
+
         $type = $this->type ?? $this->getForm()->get('type')->getData();
+
         if (!$this->breedSearch || !$type instanceof PetType) {
             $this->filteredBreeds = [];
+            $this->breedChoice = null;
+            $this->breedMixText = null;
             return;
         }
 
         $breeds = $this->em->getRepository(PetBreed::class)->findBySearch($type, $this->breedSearch);
+
         $this->filteredBreeds = array_map(
-            fn(PetBreed $b) => ['id' => (string) $b->getId(), 'name' => $b->getName()],
+            fn(PetBreed $b) => ['id'=>(string)$b->getId(),'name'=>$b->getName()],
             $breeds ?? []
         );
+
+        if (!empty($this->filteredBreeds)) {
+            $this->breedChoice = null;
+            $this->breedMixText = null;
+        }
     }
+
 
     #[LiveAction]
     public function setBreed(#[LiveArg('id')] string $id): void
@@ -95,9 +125,12 @@ class PetRegistrationForm extends AbstractController
 
         if ($breed = $this->em->getRepository(PetBreed::class)->find($id)) {
             $this->breedSearch = $breed->getName();
+            $this->selectedBreedName = $breed->getName();
         }
 
         $this->filteredBreeds = [];
+        $this->breedChoice = null;
+        $this->breedMixText = null;
     }
 
     #[LiveAction]
@@ -105,16 +138,29 @@ class PetRegistrationForm extends AbstractController
     {
         $this->submitForm();
 
-        if (!$this->getForm()->isValid()) {
-            return;
-        }
-
         /** @var Pet $pet */
         $pet = $this->getForm()->getData();
 
-        if (!$pet->getBreed() && $this->breedId) {
-            if ($breed = $this->em->getRepository(PetBreed::class)->find($this->breedId)) {
-                $pet->setBreed($breed);
+        if ($this->breedId) {
+            $breed = $this->em->getRepository(PetBreed::class)->find($this->breedId);
+            if (!$breed) {
+                $this->getForm()->addError(new FormError('Selected breed is invalid.'));
+                return;
+            }
+            $pet->setBreed($breed);
+            $pet->setBreedOther(null);
+        } else {
+            $pet->setBreed(null);
+
+            if ($this->breedChoice === 'mix') {
+                $mix = trim((string) $this->breedMixText);
+                if ($mix === '') {
+                    $this->getForm()->addError(new FormError('Please describe the mix breed.'));
+                    return;
+                }
+                $pet->setBreedOther($mix);
+            } else {
+                $pet->setBreedOther(null);
             }
         }
 
@@ -122,13 +168,19 @@ class PetRegistrationForm extends AbstractController
             $date = null;
             if ($this->dobYear && $this->dobMonth && $this->dobDay) {
                 try {
-                    $date = new \DateTimeImmutable(sprintf('%04d-%02d-%02d', $this->dobYear, $this->dobMonth, $this->dobDay));
+                    $date = new \DateTimeImmutable(
+                        sprintf('%04d-%02d-%02d', $this->dobYear, $this->dobMonth, $this->dobDay)
+                    );
                 } catch (\Throwable) {}
             }
             $pet->setDateOfBirth($date);
             $pet->setApproximateAge(null);
         } else {
             $pet->setDateOfBirth(null);
+        }
+
+        if (!$this->getForm()->isValid()) {
+            return;
         }
 
         $this->em->persist($pet);
