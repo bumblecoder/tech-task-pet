@@ -18,283 +18,333 @@
 {% import _self as ui %}
 
 <div {{ attributes }} class="bg-white p-6 rounded-lg shadow max-w-md w-full space-y-4 mx-auto px-4">
-    {{ form_start(form, {
-        attr: {
-            'data-action': 'live#action:prevent',
-            'data-live-action-param': 'save',
-            'novalidate': 'novalidate'
-        }
-    }) }}
+    {% if this.showSummary and this.summary %}
+        <div class="bg-white p-6 rounded-lg shadow max-w-md w-full space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-medium text-blue-900">Pet Summary</h2>
+                <span class="text-green-500 text-xl rotate-45">🐾</span>
+            </div>
 
-    <div class="flex justify-between items-end w-full mb-6 px-4">
-        <i class="fas fa-paw text-green-500 text-xl rotate-90 translate-y-0"></i>
-        <i class="fas fa-paw text-green-500 text-xl rotate-90 translate-y-2"></i>
-        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
-        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-2"></i>
-        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
-        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-2"></i>
-        <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
-    </div>
-
-    <h1 class="text-2xl font-medium text-blue-900 mb-6 text-left">Tell us about your pet</h1>
-
-    <div>
-        {{ form_label(form.name, 'Pet’s name', { label_attr: { class: 'block mb-1 font-semibold text-sm text-gray-700' } }) }}
-        {% set nameInvalid = not form.name.vars.valid %}
-        {{ form_widget(form.name, { attr: { class: ui.input_class(nameInvalid), placeholder: "Enter your pet's name" } }) }}
-        {{ form_errors(form.name) }}
-    </div>
-
-    <fieldset class="mt-4">
-        <legend class="font-semibold text-gray-700 mb-2 text-sm">Pet type</legend>
-        <div class="flex max-w-xs">
-            {% for child in form.type %}
-                {% set rounded = loop.first ? 'rounded-l' : (loop.last ? 'rounded-r' : '') %}
-                <div class="relative">
-                    {{ form_widget(child, { attr: { class: 'sr-only peer' } }) }}
-                    <label
-                            for="{{ child.vars.id }}"
-                            data-action="click->live#action"
-                            data-live-action-param="pickType"
-                            data-live-id-param="{{ child.vars.value }}"
-                            class="cursor-pointer px-4 py-2 {{ rounded }}
-                   border border-[color:#1D9BD0] hover:border-[color:#1983b8]
-                   {{ not loop.first ? 'border-l-0' : '' }}
-                   peer-checked:bg-[color:#1D9BD0]
-                   peer-checked:text-white
-                   peer-checked:border-[color:#1D9BD0]
-                   transition block">
-                        {{ child.vars.label }}
-                    </label>
+            <div class="grid grid-cols-2 gap-y-3 text-sm text-gray-800">
+                <div><span class="font-semibold">Name:</span> {{ this.summary.name }}</div>
+                <div><span class="font-semibold">Type:</span> {{ this.summary.type }}</div>
+                <div><span class="font-semibold">Breed:</span> {{ this.summary.breed }}</div>
+                <div>
+                    <span class="font-semibold">Mix:</span>
+                    {% if this.summary.mix == 'Yes' and this.summary.mixText %}
+                        Yes — {{ this.summary.mixText }}
+                    {% else %}
+                        {{ this.summary.mix }}
+                    {% endif %}
                 </div>
-            {% endfor %}
+                <div><span class="font-semibold">Gender:</span> {{ this.summary.gender }}</div>
+                <div><span class="font-semibold">Age/Birthdate:</span> {{ this.summary.ageOrDob }}</div>
+                <div class="col-span-2">
+                    <span class="font-semibold">Dangerous Animal:</span>
+                    {% if this.summary.dangerous %}
+                        <span class="text-red-600 font-semibold">Yes</span>
+                    {% else %}
+                        No
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if this.summary.dangerous %}
+                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg flex items-center gap-2" role="alert">
+                    <span>⚠️</span>
+                    <span>This pet is classified as a dangerous animal.</span>
+                </div>
+            {% endif %}
+
+            <div class="mt-4 flex gap-2">
+                <button
+                        type="button"
+                        class="px-4 py-2 rounded bg-[color:#1D9BD0] text-white hover:bg-[color:#1983b8] transition"
+                        data-action="live#action"
+                        data-live-action-param="addAnother">
+                    Add another pet
+                </button>
+            </div>
         </div>
-        {{ form_errors(form.type) }}
-    </fieldset>
+    {% else %}
+        {{ form_start(form, {
+            attr: {
+                'data-action': 'live#action:prevent',
+                'data-live-action-param': 'save',
+                'novalidate': 'novalidate'
+            }
+        }) }}
 
-    <div class="relative mt-4">
-        <label for="breed-search" class="block mb-1 font-semibold text-sm text-gray-700">
-            What breed are they?
-        </label>
+        <div class="flex justify-between items-end w-full mb-6 px-4">
+            <i class="fas fa-paw text-green-500 text-xl rotate-90 translate-y-0"></i>
+            <i class="fas fa-paw text-green-500 text-xl rotate-90 translate-y-2"></i>
+            <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
+            <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-2"></i>
+            <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
+            <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-2"></i>
+            <i class="fas fa-paw text-gray-400 text-xl rotate-90 translate-y-0"></i>
+        </div>
 
-        <input
-                id="breed-search"
-                type="search"
-                class="w-full border border-gray-300 rounded px-3 py-2"
-                placeholder="Can't find it?"
-                data-model="debounce(300)|breedSearch"
-                data-action="input->live#action"
-                data-live-action-param="searchBreeds"
-                autocomplete="off"
-                value="{{ this.breedSearch ?? '' }}"
-        />
+        <h1 class="text-2xl font-medium text-blue-900 mb-6 text-left">Tell us about your pet</h1>
 
-        <input type="hidden" name="{{ form.breed.vars.full_name }}" value="{{ this.breedId ?? '' }}">
+        <div>
+            {{ form_label(form.name, 'Pet’s name', { label_attr: { class: 'block mb-1 font-semibold text-sm text-gray-700' } }) }}
+            {% set nameInvalid = not form.name.vars.valid %}
+            {{ form_widget(form.name, { attr: { class: ui.input_class(nameInvalid), placeholder: "Enter your pet's name" } }) }}
+            {{ form_errors(form.name) }}
+        </div>
 
-        {% if filteredBreeds is defined and filteredBreeds is not empty %}
-            <div class="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded shadow max-h-64 overflow-auto">
-                {% for b in filteredBreeds %}
-                    <button
-                            type="button"
-                            class="w-full text-left px-4 py-2 hover:bg-gray-100"
-                            data-action="click->live#action"
-                            data-live-action-param="setBreed"
-                            data-live-id-param="{{ b.id }}">
-                        {{ b.name }}
-                    </button>
+        <fieldset class="mt-4">
+            <legend class="font-semibold text-gray-700 mb-2 text-sm">Pet type</legend>
+            <div class="flex max-w-xs">
+                {% for child in form.type %}
+                    {% set rounded = loop.first ? 'rounded-l' : (loop.last ? 'rounded-r' : '') %}
+                    <div class="relative">
+                        {{ form_widget(child, { attr: { class: 'sr-only peer' } }) }}
+                        <label
+                                for="{{ child.vars.id }}"
+                                data-action="click->live#action"
+                                data-live-action-param="pickType"
+                                data-live-id-param="{{ child.vars.value }}"
+                                class="cursor-pointer px-4 py-2 {{ rounded }}
+                       border border-[color:#1D9BD0] hover:border-[color:#1983b8]
+                       {{ not loop.first ? 'border-l-0' : '' }}
+                       peer-checked:bg-[color:#1D9BD0]
+                       peer-checked:text-white
+                       peer-checked:border-[color:#1D9BD0]
+                       transition block">
+                            {{ child.vars.label }}
+                        </label>
+                    </div>
                 {% endfor %}
             </div>
-        {% endif %}
+            {{ form_errors(form.type) }}
+        </fieldset>
 
-        {% set noBreedChosen = this.breedId is empty %}
-        {% set searchEmpty   = this.breedSearch is empty %}
-        {% set noResults     = (filteredBreeds is defined and filteredBreeds is empty) %}
-        {% set currentChoice = pet_registration.breedChoice ?? form.breedChoice.vars.data %}
-        {% set showBreedError = this.userSubmit and noBreedChosen and (searchEmpty or noResults) %}
+        <div class="relative mt-4">
+            <label for="breed-search" class="block mb-1 font-semibold text-sm text-gray-700">
+                What breed are they?
+            </label>
 
-        {% if showBreedError %}
-            <div class="text-sm text-red-600 mt-1">
-                We couldn't find this breed. Please choose an option below.
-            </div>
-        {% endif %}
+            <input
+                    id="breed-search"
+                    type="search"
+                    class="w-full border border-gray-300 rounded px-3 py-2"
+                    placeholder="Can't find it?"
+                    data-model="debounce(300)|breedSearch"
+                    data-action="input->live#action"
+                    data-live-action-param="searchBreeds"
+                    autocomplete="off"
+                    value="{{ this.breedSearch ?? '' }}"
+            />
 
-        {% set showBreedChoice = (this.userSubmit and noBreedChosen and (searchEmpty or noResults))
-            or (noBreedChosen and (not searchEmpty) and noResults) %}
+            <input type="hidden" name="{{ form.breed.vars.full_name }}" value="{{ this.breedId ?? '' }}">
 
-        {% if showBreedChoice %}
-            <fieldset class="mt-3">
-                <legend class="font-semibold text-gray-700 mb-1 text-sm">Choose One</legend>
+            {% if filteredBreeds is defined and filteredBreeds is not empty %}
+                <div class="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded shadow max-h-64 overflow-auto">
+                    {% for b in filteredBreeds %}
+                        <button
+                                type="button"
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100"
+                                data-action="click->live#action"
+                                data-live-action-param="setBreed"
+                                data-live-id-param="{{ b.id }}">
+                            {{ b.name }}
+                        </button>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-                <div class="flex items-center gap-6 text-sm text-gray-800">
-                    <label class="inline-flex items-center gap-2 cursor-pointer">
+            {% set noBreedChosen = this.breedId is empty %}
+            {% set searchEmpty   = this.breedSearch is empty %}
+            {% set noResults     = (filteredBreeds is defined and filteredBreeds is empty) %}
+            {% set currentChoice = pet_registration.breedChoice ?? form.breedChoice.vars.data %}
+            {% set showBreedError = this.userSubmit and noBreedChosen and (searchEmpty or noResults) %}
+
+            {% if showBreedError %}
+                <div class="text-sm text-red-600 mt-1">
+                    We couldn't find this breed. Please choose an option below.
+                </div>
+            {% endif %}
+
+            {% set showBreedChoice = (this.userSubmit and noBreedChosen and (searchEmpty or noResults))
+                or (noBreedChosen and (not searchEmpty) and noResults) %}
+
+            {% if showBreedChoice %}
+                <fieldset class="mt-3">
+                    <legend class="font-semibold text-gray-700 mb-1 text-sm">Choose One</legend>
+
+                    <div class="flex items-center gap-6 text-sm text-gray-800">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input
+                                    type="radio"
+                                    name="{{ form.breedChoice.vars.full_name }}"
+                                    value="unknown"
+                                    class="h-4 w-4 cursor-pointer [appearance:auto] [-webkit-appearance:auto] [accent-color:#1D9BD0]"
+                                    data-model="on(change)|pet_registration.breedChoice"
+                                    {{ currentChoice == 'unknown' ? 'checked' : '' }}
+                            />
+                            <span>I don't know</span>
+                        </label>
+
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input
+                                    type="radio"
+                                    name="{{ form.breedChoice.vars.full_name }}"
+                                    value="mix"
+                                    class="h-4 w-4 cursor-pointer [appearance:auto] [-webkit-appearance:auto] [accent-color:#1D9BD0]"
+                                    data-model="on(change)|pet_registration.breedChoice"
+                                    {{ currentChoice == 'mix' ? 'checked' : '' }}
+                            />
+                            <span>It is a mix</span>
+                        </label>
+                    </div>
+
+                    <div class="form-error-message {{ (this.userSubmit and (currentChoice is empty)) ? '' : 'hidden' }}">
+                        {{ form_errors(form.breedChoice) }}
+                    </div>
+
+                    <div class="mt-2 {{ (currentChoice == 'mix') ? '' : 'hidden' }}">
+                        <label class="block mb-1 font-semibold text-sm text-gray-700">Please specify the mix breed</label>
                         <input
-                                type="radio"
-                                name="{{ form.breedChoice.vars.full_name }}"
-                                value="unknown"
-                                class="h-4 w-4 cursor-pointer [appearance:auto] [-webkit-appearance:auto] [accent-color:#1D9BD0]"
-                                data-model="on(change)|pet_registration.breedChoice"
-                                {{ currentChoice == 'unknown' ? 'checked' : '' }}
+                                type="text"
+                                name="{{ form.breedOther.vars.full_name }}"
+                                class="{{ ui.input_class(false) }}"
+                                placeholder="Describe the mix"
+                                data-model="on(change)|pet_registration.breedOther"
+                                autocomplete="off"
+                                value="{{ pet_registration.breedOther ?? form.breedOther.vars.data ?? '' }}"
                         />
-                        <span>I don't know</span>
-                    </label>
-
-                    <label class="inline-flex items-center gap-2 cursor-pointer">
-                        <input
-                                type="radio"
-                                name="{{ form.breedChoice.vars.full_name }}"
-                                value="mix"
-                                class="h-4 w-4 cursor-pointer [appearance:auto] [-webkit-appearance:auto] [accent-color:#1D9BD0]"
-                                data-model="on(change)|pet_registration.breedChoice"
-                                {{ currentChoice == 'mix' ? 'checked' : '' }}
-                        />
-                        <span>It is a mix</span>
-                    </label>
-                </div>
-
-                <div class="form-error-message {{ (this.userSubmit and (currentChoice is empty)) ? '' : 'hidden' }}">
-                    {{ form_errors(form.breedChoice) }}
-                </div>
-
-                <div class="mt-2 {{ (currentChoice == 'mix') ? '' : 'hidden' }}">
-                    <label class="block mb-1 font-semibold text-sm text-gray-700">Please specify the mix breed</label>
-                    <input
-                            type="text"
-                            name="{{ form.breedOther.vars.full_name }}"
-                            class="{{ ui.input_class(false) }}"
-                            placeholder="Describe the mix"
-                            data-model="on(change)|pet_registration.breedOther"
-                            autocomplete="off"
-                            value="{{ pet_registration.breedOther ?? form.breedOther.vars.data ?? '' }}"
-                    />
-                </div>
-            </fieldset>
-        {% endif %}
-    </div>
-
-    <fieldset class="mt-6 mb-4">
-        <legend class="font-semibold text-gray-700 mb-2 text-sm">What gender are they?</legend>
-        <div class="flex max-w-xs">
-            {% for child in form.sex %}
-                {% set rounded = loop.first ? 'rounded-l' : (loop.last ? 'rounded-r' : '') %}
-                <div>
-                    {{ form_widget(child, { attr: { class: 'sr-only peer' } }) }}
-                    <label for="{{ child.vars.id }}"
-                           class="cursor-pointer px-4 py-2 {{ rounded }}
-                        border border-[color:#1D9BD0] hover:border-[color:#1983b8]
-                        {{ not loop.first ? 'border-l-0' : '' }}
-                        peer-checked:bg-[color:#1D9BD0]
-                        peer-checked:text-white
-                        peer-checked:border-[color:#1D9BD0]
-                        block transition">
-                        {{ child.vars.label }}
-                    </label>
-                </div>
-            {% endfor %}
+                    </div>
+                </fieldset>
+            {% endif %}
         </div>
-        {{ form_errors(form.sex) }}
-    </fieldset>
 
-    <fieldset class="mt-4">
-        <legend class="font-semibold text-gray-700 mb-2 text-sm">Do you know their date of birth?</legend>
+        <fieldset class="mt-6 mb-4">
+            <legend class="font-semibold text-gray-700 mb-2 text-sm">What gender are they?</legend>
+            <div class="flex max-w-xs">
+                {% for child in form.sex %}
+                    {% set rounded = loop.first ? 'rounded-l' : (loop.last ? 'rounded-r' : '') %}
+                    <div>
+                        {{ form_widget(child, { attr: { class: 'sr-only peer' } }) }}
+                        <label for="{{ child.vars.id }}"
+                               class="cursor-pointer px-4 py-2 {{ rounded }}
+                            border border-[color:#1D9BD0] hover:border-[color:#1983b8]
+                            {{ not loop.first ? 'border-l-0' : '' }}
+                            peer-checked:bg-[color:#1D9BD0]
+                            peer-checked:text-white
+                            peer-checked:border-[color:#1D9BD0]
+                            block transition">
+                            {{ child.vars.label }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            {{ form_errors(form.sex) }}
+        </fieldset>
 
-        <div class="flex max-w-xs">
-            <div>
-                <input type="radio" id="dob-no" name="dob-known" value="0"
-                       class="hidden peer/dob-no"
-                       data-model="dobKnown" data-model-event="change"
-                       {% if this.dobKnown == false %}checked{% endif %}/>
-                <label for="dob-no"
+        <fieldset class="mt-4">
+            <legend class="font-semibold text-gray-700 mb-2 text-sm">Do you know their date of birth?</legend>
+
+            <div class="flex max-w-xs">
+                <div>
+                    <input type="radio" id="dob-no" name="dob-known" value="0"
+                           class="hidden peer/dob-no"
+                           data-model="dobKnown" data-model-event="change"
+                           {% if this.dobKnown == false %}checked{% endif %}/>
+                    <label for="dob-no"
+                           class="cursor-pointer px-4 py-2 rounded-l border border-[color:#1D9BD0]
+                          hover:border-[color:#1983b8]
+                          peer-checked/dob-no:bg-[color:#1D9BD0] peer-checked/dob-no:text-white
+                          peer-checked/dob-no:border-[color:#1D9BD0] transition block">
+                        No
+                    </label>
+                </div>
+
+                <div>
+                    <input type="radio" id="dob-yes" name="dob-known" value="1"
+                           class="hidden peer/dob-yes"
+                           data-model="dobKnown" data-model-event="change"
+                           {% if this.dobKnown is same as(true) %}checked{% endif %}/>
+                    <label for="dob-yes"
+                           class="cursor-pointer px-4 py-2 rounded-r border border-[color:#1D9BD0] border-l-0
+                          hover:border-[color:#1983b8]
+                          peer-checked/dob-yes:bg-[color:#1D9BD0] peer-checked/dob-yes:text-white
+                          peer-checked/dob-yes:border-[color:#1D9BD0] transition block">
+                        Yes
+                    </label>
+                </div>
+            </div>
+
+            {% if this.dobKnown is same as(false) or this.dobKnown is empty %}
+                <div class="mt-3">
+                    <label class="block mb-1 font-semibold text-gray-700 text-sm">Approximate Age</label>
+                    {{ form_widget(form.approximateAge, { attr: { class: 'w-full max-w-xs border border-gray-300 bg-white rounded px-3 py-2 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]' } }) }}
+                    {{ form_errors(form.approximateAge) }}
+                </div>
+            {% endif %}
+
+            {{ form_widget(form.dateOfBirth, { type: 'hidden', attr: { 'data-model': 'form.dateOfBirth' } }) }}
+
+            {% if this.dobKnown is same as(true) %}
+                <div class="mt-3">
+                    <label class="block font-semibold text-gray-700 text-sm mb-2">Birthdate</label>
+                    <div class="flex gap-2">
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-xs mb-1" for="dob-day">Day</label>
+                            <input id="dob-day" type="number" inputmode="numeric" min="1" max="31" placeholder="DD"
+                                   class="w-20 border border-gray-300 rounded px-2 py-1 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
+                                   data-model="dobDay" required/>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-xs mb-1" for="dob-month">Month</label>
+                            <input id="dob-month" type="number" inputmode="numeric" min="1" max="12" placeholder="MM"
+                                   class="w-20 border border-gray-300 rounded px-2 py-1 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
+                                   data-model="dobMonth" required/>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-xs mb-1" for="dob-year">Year</label>
+                            <input id="dob-year" type="number" inputmode="numeric" min="1900" max="{{ 'now'|date('Y') }}" placeholder="YYYY"
+                                   class="w-28 border border-gray-300 rounded px-2 py-1 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
+                                   data-model="dobYear" required/>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </fieldset>
+
+        <fieldset class="mt-6">
+            <legend class="font-semibold text-gray-700 mb-2 text-sm">Is the pet dangerous?</legend>
+            <div class="flex max-w-xs">
+                <input type="radio" id="dangerous-no" name="{{ form.isDangerous.vars.full_name }}" value="0"
+                       class="hidden peer/dno"
+                       {% if form.isDangerous.vars.value is same as(false) or form.isDangerous.vars.value == 0 %}checked{% endif %} required/>
+                <label for="dangerous-no"
                        class="cursor-pointer px-4 py-2 rounded-l border border-[color:#1D9BD0]
-                      hover:border-[color:#1983b8]
-                      peer-checked/dob-no:bg-[color:#1D9BD0] peer-checked/dob-no:text-white
-                      peer-checked/dob-no:border-[color:#1D9BD0] transition block">
+                        hover:border-[color:#1983b8]
+                        peer-checked/dno:bg-[color:#1D9BD0] peer-checked/dno:text-white
+                        peer-checked/dno:border-[color:#1D9BD0] transition">
                     No
                 </label>
-            </div>
 
-            <div>
-                <input type="radio" id="dob-yes" name="dob-known" value="1"
-                       class="hidden peer/dob-yes"
-                       data-model="dobKnown" data-model-event="change"
-                       {% if this.dobKnown is same as(true) %}checked{% endif %}/>
-                <label for="dob-yes"
-                       class="cursor-pointer px-4 py-2 rounded-r border border-[color:#1D9BD0] border-l-0
-                      hover:border-[color:#1983b8]
-                      peer-checked/dob-yes:bg-[color:#1D9BD0] peer-checked/dob-yes:text-white
-                      peer-checked/dob-yes:border-[color:#1D9BD0] transition block">
+                <input type="radio" id="dangerous-yes" name="{{ form.isDangerous.vars.full_name }}" value="1"
+                       class="hidden peer/dyes"
+                       {% if form.isDangerous.vars.value is same as(true) or form.isDangerous.vars.value == 1 %}checked{% endif %} required/>
+                <label for="dangerous-yes"
+                       class="cursor-pointer px-4 py-2 rounded-r border border-[color:#1D9BD0] hover:border-[color:#1983b8] border-l-0
+                        peer-checked/dyes:bg-[color:#1D9BD0] peer-checked/dyes:text-white
+                        peer-checked/dyes:border-[color:#1D9BD0] transition">
                     Yes
                 </label>
             </div>
-        </div>
+            {{ form_errors(form.isDangerous) }}
+        </fieldset>
 
-        {% if this.dobKnown is same as(false) or this.dobKnown is empty %}
-            <div class="mt-3">
-                <label class="block mb-1 font-semibold text-gray-700 text-sm">Approximate Age</label>
-                {{ form_widget(form.approximateAge, { attr: { class: 'w-full max-w-xs border border-gray-300 bg-white rounded px-3 py-2 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]' } }) }}
-                {{ form_errors(form.approximateAge) }}
-            </div>
-        {% endif %}
+        <button type="submit"
+                class="mt-6 w-full bg-[color:#1D9BD0] hover:bg-[color:#1983b8] text-white font-semibold py-3 rounded transition">
+            Save Pet
+        </button>
 
-        {{ form_widget(form.dateOfBirth, { type: 'hidden', attr: { 'data-model': 'form.dateOfBirth' } }) }}
-
-        {% if this.dobKnown is same as(true) %}
-            <div class="mt-3">
-                <label class="block font-semibold text-gray-700 text-sm mb-2">Birthdate</label>
-                <div class="flex gap-2">
-                    <div class="flex flex-col">
-                        <label class="text-gray-600 text-xs mb-1" for="dob-day">Day</label>
-                        <input id="dob-day" type="number" inputmode="numeric" min="1" max="31" placeholder="DD"
-                               class="w-20 border border-gray-300 rounded px-2 py-1 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
-                               data-model="dobDay" required/>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-gray-600 text-xs mb-1" for="dob-month">Month</label>
-                        <input id="dob-month" type="number" inputmode="numeric" min="1" max="12" placeholder="MM"
-                               class="w-20 border border-gray-300 rounded px-2 py-1 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
-                               data-model="dobMonth" required/>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-gray-600 text-xs mb-1" for="dob-year">Year</label>
-                        <input id="dob-year" type="number" inputmode="numeric" min="1900" max="{{ 'now'|date('Y') }}" placeholder="YYYY"
-                               class="w-28 border border-gray-300 rounded px-2 py-1 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[color:#1D9BD0] focus:border-[color:#1D9BD0]"
-                               data-model="dobYear" required/>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    </fieldset>
-
-    <fieldset class="mt-6">
-        <legend class="font-semibold text-gray-700 mb-2 text-sm">Is the pet dangerous?</legend>
-        <div class="flex max-w-xs">
-            <input type="radio" id="dangerous-no" name="{{ form.isDangerous.vars.full_name }}" value="0"
-                   class="hidden peer/dno"
-                   {% if form.isDangerous.vars.value is same as(false) or form.isDangerous.vars.value == 0 %}checked{% endif %} required/>
-            <label for="dangerous-no"
-                   class="cursor-pointer px-4 py-2 rounded-l border border-[color:#1D9BD0]
-                    hover:border-[color:#1983b8]
-                    peer-checked/dno:bg-[color:#1D9BD0] peer-checked/dno:text-white
-                    peer-checked/dno:border-[color:#1D9BD0] transition">
-                No
-            </label>
-
-            <input type="radio" id="dangerous-yes" name="{{ form.isDangerous.vars.full_name }}" value="1"
-                   class="hidden peer/dyes"
-                   {% if form.isDangerous.vars.value is same as(true) or form.isDangerous.vars.value == 1 %}checked{% endif %} required/>
-            <label for="dangerous-yes"
-                   class="cursor-pointer px-4 py-2 rounded-r border border-[color:#1D9BD0] hover:border-[color:#1983b8] border-l-0
-                    peer-checked/dyes:bg-[color:#1D9BD0] peer-checked/dyes:text-white
-                    peer-checked/dyes:border-[color:#1D9BD0] transition">
-                Yes
-            </label>
-        </div>
-        {{ form_errors(form.isDangerous) }}
-    </fieldset>
-
-    <button type="submit"
-            class="mt-6 w-full bg-[color:#1D9BD0] hover:bg-[color:#1983b8] text-white font-semibold py-3 rounded transition">
-        Save Pet
-    </button>
-
-    {{ form_end(form, { render_rest: false }) }}
+        {{ form_end(form, { render_rest: false }) }}
+    {% endif %}
 </div>

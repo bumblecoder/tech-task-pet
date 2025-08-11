@@ -69,6 +69,12 @@ class PetRegistrationForm extends AbstractController
     #[LiveProp(writable: true)]
     public bool $userSubmit = false;
 
+    #[LiveProp]
+    public ?array $summary = null;
+
+    #[LiveProp(writable: true)]
+    public bool $showSummary = false;
+
     protected function instantiateForm(): FormInterface
     {
         return $this->createForm(PetRegistrationType::class, new Pet());
@@ -168,16 +174,20 @@ class PetRegistrationForm extends AbstractController
         } else {
             $pet->setBreed(null);
 
-            $choice = $form->has('breedChoice') ? $form->get('breedChoice')->getData() : null; // 'unknown' | 'mix' | null
-            $mixTxt = $form->has('breedOther') ? (string) $form->get('breedOther')->getData() : '';
+            $choice  = $form->has('breedChoice') ? $form->get('breedChoice')->getData() : null; // 'unknown'|'mix'|null
+            $mixText = $form->has('breedOther')  ? trim((string) $form->get('breedOther')->getData()) : '';
+
+            if ($choice === null || $choice === '') {
+                $form->get('breedChoice')->addError(new FormError('Please choose one option.'));
+                return;
+            }
 
             if ($choice === 'mix') {
-                $mixTxt = trim($mixTxt);
-                if ($mixTxt == '') {
-                    $form->addError(new FormError('Please describe the mix breed.'));
+                if ($mixText === '') {
+                    $form->get('breedOther')->addError(new FormError('Please specify the mix breed.'));
                     return;
                 }
-                $pet->setBreedOther($mixTxt);
+                $pet->setBreedOther($mixText);
             } else {
                 $pet->setBreedOther(null);
             }
@@ -204,6 +214,23 @@ class PetRegistrationForm extends AbstractController
         $this->em->persist($pet);
         $this->em->flush();
 
+        $this->summary = [
+            'name'      => $pet->getName() ?: '—',
+            'type'      => $pet->getType()?->getName() ?: '—',
+            'breed'     => $pet->getBreed()?->getName()
+                ?? ($pet->getBreedOther() ? 'Mix' : 'Unknown'),
+            'mix'       => $pet->getBreedOther() ? 'Yes' : 'No',
+            'mixText'   => $pet->getBreedOther() ?: null,
+            'gender'    => $pet->getSex()?->name ?? '—',
+            'ageOrDob'  => $pet->getDateOfBirth()
+                ? $pet->getDateOfBirth()->format('Y-m-d')
+                : ($pet->getApproximateAge() ? ('~'.$pet->getApproximateAge().' years') : '—'),
+            'dangerous' => $pet->isDangerous(),
+        ];
+
+        $this->showSummary = true;
+        $this->disableSubmitOnRender = true;
+
         $this->resetForm();
 
         $this->userSubmit   = false;
@@ -228,5 +255,25 @@ class PetRegistrationForm extends AbstractController
                 $this->getForm()->get('dateOfBirth')->setData(null);
             }
         }
+    }
+
+    #[LiveAction]
+    public function addAnother(): void
+    {
+        $this->showSummary = false;
+        $this->summary = null;
+        $this->disableSubmitOnRender = false;
+
+        $this->resetForm();
+        if (\method_exists($this, 'resetValidation')) {
+            $this->resetValidation();
+        }
+
+        $this->breedId = null;
+        $this->breedSearch = '';
+        $this->breedChoice = null;
+        $this->breedMixText = null;
+        $this->dobYear = $this->dobMonth = $this->dobDay = null;
+        $this->userSubmit = false;
     }
 }
