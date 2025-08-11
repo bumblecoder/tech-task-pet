@@ -93,3 +93,15 @@ input[type="search"] {
 .input-error {
     @apply border-red-500 focus:border-red-500 focus:ring-red-500;
 }
+
+.radio-error input[type="radio"] {
+    @apply border-red-500 ring-red-500;
+}
+
+.radio-error label {
+    @apply text-red-600;
+}
+
+.form-error-message {
+    @apply text-red-600 text-sm mt-1;
+}

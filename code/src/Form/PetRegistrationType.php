@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PetRegistrationType extends AbstractType
 {
@@ -36,6 +37,20 @@ class PetRegistrationType extends AbstractType
             ])
             ->add('breedOther', HiddenType::class, [
                 'required' => false,
+            ])
+            ->add('breedChoice', ChoiceType::class, [
+                'choices' => [
+                    "I don't know" => 'unknown',
+                    "It is a mix"  => 'mix',
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'mapped'   => false,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Please choose one option.',
+                    ]),
+                ],
             ])
             ->add('sex', ChoiceType::class, [
                 'choices' => [
