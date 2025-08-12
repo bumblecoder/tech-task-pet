@@ -26,6 +26,8 @@ Ensure you have Docker and Docker Compose installed on your machine.
    ```
    This command will build and start the necessary Docker containers. The process may take some time.
    
+   To destroy application:
+   ```make down```
 3. Access the application:
    
    By default, the application will be available on port 8088 of localhost. Ensure this port is available; otherwise, the build may fail.
