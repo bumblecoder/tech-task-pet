@@ -13,12 +13,13 @@ WORKDIR /code
 
 RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     default-mysql-client \
+    libsqlite3-dev \
     libicu-dev \
     libzip-dev \
     unzip \
     netcat \
  && docker-php-ext-configure intl \
- && docker-php-ext-install mysqli pdo_mysql intl zip \
+ && docker-php-ext-install mysqli pdo_mysql pdo_sqlite intl zip \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN if [ "$APP_ENV" = "dev" ] || [ "$APP_ENV" = "test" ]; then \
