@@ -16,6 +16,10 @@ services:
     App\:
         resource: '../src/'
 
+    _instanceof:
+        App\Service\Pet\PetDateHandlerInterface:
+            tags: [ 'app.pet_date_handler' ]
+
     App\Service\Pet\PetBreedResolverInterface: '@App\Service\Pet\PetBreedResolver'
 
     App\Service\Pet\CachedPetBreedResolver:

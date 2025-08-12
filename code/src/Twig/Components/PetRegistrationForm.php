@@ -11,13 +11,14 @@ declare(strict_types = 1);
 namespace App\Twig\Components;
 
 use App\Entity\Pet;
-use App\Entity\PetBreed;
 use App\Entity\PetType;
 use App\Form\PetRegistrationType;
 use App\Service\Pet\BreedSearchService;
 use App\Service\Pet\BreedStateFactory;
+use App\Service\Pet\DateParts;
 use App\Service\Pet\PetBreedResolverInterface;
 use App\Service\Pet\PetBreedSelectionApplier;
+use App\Service\Pet\PetDateApplier;
 use App\Service\Pet\PetTypeResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -92,7 +93,8 @@ class PetRegistrationForm extends AbstractController
         private readonly BreedStateFactory $breedStateFactory,
         private readonly BreedSearchService $breedSearchService,
         private readonly PetBreedResolverInterface $petBreedResolver,
-        private readonly PetBreedSelectionApplier $breedSelectionApplier
+        private readonly PetBreedSelectionApplier $breedSelectionApplier,
+        private readonly PetDateApplier $petDateApplier,
     ) {
     }
 
@@ -199,19 +201,11 @@ class PetRegistrationForm extends AbstractController
             return;
         }
 
-        if ($this->dobKnown) {
-            $date = null;
-            if ($this->dobYear && $this->dobMonth && $this->dobDay) {
-                try {
-                    $date = new \DateTimeImmutable(sprintf('%04d-%02d-%02d', $this->dobYear, $this->dobMonth, $this->dobDay));
-                } catch (\Throwable) {
-                }
-            }
-            $pet->setDateOfBirth($date);
-            $pet->setApproximateAge(null);
-        } else {
-            $pet->setDateOfBirth(null);
-        }
+        $this->petDateApplier->apply(
+            $pet,
+            $this->dobKnown,
+            new DateParts($this->dobYear, $this->dobMonth, $this->dobDay)
+        );
 
         if (!$form->isValid()) {
             return;

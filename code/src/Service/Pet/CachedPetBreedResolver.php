@@ -24,7 +24,8 @@ final readonly class CachedPetBreedResolver implements PetBreedResolverInterface
         private PetBreedResolverInterface $inner,
         private CacheInterface $cache,
         private EntityManagerInterface $em,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws InvalidArgumentException
@@ -32,9 +33,10 @@ final readonly class CachedPetBreedResolver implements PetBreedResolverInterface
      */
     public function byId(string $id): ?PetBreed
     {
-        $exists = $this->cache->get('breed_exists_'.$id, function (ItemInterface $item) use ($id) {
+        $exists = $this->cache->get('breed_exists_' . $id, function (ItemInterface $item) use ($id) {
             $item->expiresAfter(3600);
-            return $this->inner->byId($id) !== null;
+
+            return null !== $this->inner->byId($id);
         });
 
         if (!$exists) {
@@ -43,7 +45,7 @@ final readonly class CachedPetBreedResolver implements PetBreedResolverInterface
 
         $uuid = Uuid::fromString($id);
         /** @var PetBreed $ref */
-        $ref =  $this->em->getReference(PetBreed::class, $uuid);
+        $ref = $this->em->getReference(PetBreed::class, $uuid);
 
         return $ref;
     }

@@ -49,7 +49,7 @@ final class CachedPetBreedResolverTest extends TestCase
             ->method('getReference')
             ->with(
                 PetBreed::class,
-                self::callback(fn($u) => $u instanceof Uuid && (string)$u === $id)
+                self::callback(fn ($u) => $u instanceof Uuid && (string) $u === $id)
             )
             ->willReturnOnConsecutiveCalls($ref1, $ref2);
 

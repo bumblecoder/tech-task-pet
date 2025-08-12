@@ -1,5 +1,13 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is a part of Anton Bielykh's test Application.
+ *
+ * Copyright © 2025 All rights reserved
+ */
+
 namespace App\Service\Pet;
 
 use App\Entity\Pet;
@@ -8,14 +16,17 @@ use Symfony\Component\Form\FormInterface;
 
 final readonly class PetBreedSelectionApplier
 {
-    public function __construct(private PetBreedResolverInterface $breedResolver) {}
+    public function __construct(private PetBreedResolverInterface $breedResolver)
+    {
+    }
 
     public function apply(Pet $pet, ?string $breedId, FormInterface $form): bool
     {
-        if ($breedId !== null && $breedId !== '') {
+        if (null !== $breedId && '' !== $breedId) {
             $breed = $this->breedResolver->byId($breedId);
             if (!$breed) {
                 $form->addError(new FormError('Selected breed is invalid.'));
+
                 return false;
             }
 
@@ -29,15 +40,17 @@ final readonly class PetBreedSelectionApplier
 
         $choice = $form->has('breedChoice') ? $form->get('breedChoice')->getData() : null;
 
-        if ($choice === null || $choice === '') {
+        if (null === $choice || '' === $choice) {
             $form->get('breedChoice')->addError(new FormError('Please choose one option.'));
+
             return false;
         }
 
-        if ($choice === 'mix') {
+        if ('mix' === $choice) {
             $mixText = $form->has('breedOther') ? trim((string) $form->get('breedOther')->getData()) : '';
-            if ($mixText === '') {
+            if ('' === $mixText) {
                 $form->get('breedOther')->addError(new FormError('Please specify the mix breed.'));
+
                 return false;
             }
 

@@ -1,6 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
+
+/*
+ * This file is a part of Anton Bielykh's test Application.
+ *
+ * Copyright © 2025 All rights reserved
+ */
 
 namespace App\Tests\Unit\Service\Pet;
 
@@ -81,7 +87,7 @@ final class PetBreedSelectionApplierTest extends TestCase
             ['breedOther', true],
         ]);
         $form->method('get')->willReturnCallback(
-            fn (string $name) => $name === 'breedChoice' ? $choiceField : $otherField
+            fn (string $name) => 'breedChoice' === $name ? $choiceField : $otherField
         );
 
         $resolver = $this->createMock(PetBreedResolverInterface::class);
@@ -115,7 +121,7 @@ final class PetBreedSelectionApplierTest extends TestCase
             ['breedOther', true],
         ]);
         $form->method('get')->willReturnCallback(
-            fn (string $name) => $name === 'breedChoice' ? $choiceField : $otherField
+            fn (string $name) => 'breedChoice' === $name ? $choiceField : $otherField
         );
 
         $resolver = $this->createMock(PetBreedResolverInterface::class);
@@ -147,7 +153,7 @@ final class PetBreedSelectionApplierTest extends TestCase
             ['breedOther', true],
         ]);
         $form->method('get')->willReturnCallback(
-            fn (string $name) => $name === 'breedChoice' ? $choiceField : $otherField
+            fn (string $name) => 'breedChoice' === $name ? $choiceField : $otherField
         );
 
         $resolver = $this->createMock(PetBreedResolverInterface::class);
@@ -177,7 +183,7 @@ final class PetBreedSelectionApplierTest extends TestCase
             ['breedOther', true],
         ]);
         $form->method('get')->willReturnCallback(
-            fn (string $name) => $name === 'breedChoice' ? $choiceField : $otherField
+            fn (string $name) => 'breedChoice' === $name ? $choiceField : $otherField
         );
 
         $resolver = $this->createMock(PetBreedResolverInterface::class);
