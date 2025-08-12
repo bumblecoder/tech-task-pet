@@ -66,8 +66,12 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "importmap:install": "symfony-cmd"
         },
+        "build-assets": [
+            "bash -c 'if docker compose ps php-fpm &>/dev/null; then docker compose exec php-fpm php bin/console importmap:install && docker compose exec php-fpm php bin/console tailwind:build && docker compose exec php-fpm php bin/console asset-map:compile; else php bin/console importmap:install && php bin/console tailwind:build && php bin/console asset-map:compile; fi'"
+        ],
         "post-install-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "@build-assets"
         ],
         "post-update-cmd": [
             "@auto-scripts"
