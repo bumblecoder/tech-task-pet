@@ -140,27 +140,22 @@ class PetRegistrationForm extends AbstractController
             $this->breedMixText = null;
         }
 
-        $type = $this->type;
+        $type = $this->type ?? null;
 
-        if (!$type) {
-            $typeId = $this->formValues['type'] ?? null;
-
-            if ($typeId) {
-                $type = $this->petTypeResolver->byId((string) $typeId);
-            }
+        if (!$type && !empty($this->formValues['type'])) {
+            $type = $this->petTypeResolver->byId((string) $this->formValues['type']);
         }
 
         if (!$this->breedSearch || !$type instanceof PetType) {
             $this->filteredBreeds = [];
             $this->breedChoice = null;
             $this->breedMixText = null;
-
             return;
         }
 
-        $this->filteredBreeds = $this->breedSearchService->search($type, $this->breedSearch);
+        $this->filteredBreeds = $this->breedSearchService->search($type, (string) $this->breedSearch);
 
-        if (!empty($this->filteredBreeds)) {
+        if ($this->filteredBreeds !== []) {
             $this->breedChoice = null;
             $this->breedMixText = null;
         }

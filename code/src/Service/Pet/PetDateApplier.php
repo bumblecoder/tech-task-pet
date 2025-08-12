@@ -11,13 +11,13 @@ declare(strict_types = 1);
 namespace App\Service\Pet;
 
 use App\Entity\Pet;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final readonly class PetDateApplier
 {
     /** @param iterable<PetDateHandlerInterface> $handlers */
     public function __construct(
-        #[TaggedIterator('app.pet_date_handler')]
+        #[AutowireIterator('app.pet_date_handler')]
         private iterable $handlers)
     {
     }
