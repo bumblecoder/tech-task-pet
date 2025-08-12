@@ -7,7 +7,7 @@ DATABASE=bash -c 'for i in `seq 1 10`; do bin/console doctrine:database:create -
 MIGRATIONS = bash -c "bin/console doctrine:migrations:status | grep -q 'New Migrations' && bin/console doctrine:migrations:migrate --no-interaction || echo 'No migrations to execute'"
 WAIT_DB= \
   bash -c 'for i in `seq 1 60`; do nc -z mysql 3306 && echo "✅ MySQL ready" && exit 0 || echo "⏳ Waiting for MySQL..." && sleep 2; done && echo "❌ Timeout waiting for MySQL" && exit 1'
-
+FIXTURES = bash -c "bin/console d:f:l --no-interaction"
 all: help
 build: ## Build and deploy project from scratch
 	@echo "🚀 Building and bootstrapping the project..."
@@ -16,6 +16,7 @@ build: ## Build and deploy project from scratch
 	$(EXEC_PHP_FPM) $(COMPOSER)
 	$(EXEC_PHP_FPM) $(DATABASE)
 	$(EXEC_PHP_FPM) $(MIGRATIONS)
+	$(EXEC_PHP_FPM) $(FIXTURES)
 composer: ## Install/update/delete composer libraries
 	@echo "🎼 Installing composer packages..."
 	$(EXEC_PHP_FPM) $(COMPOSER)

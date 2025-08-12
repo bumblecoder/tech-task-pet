@@ -1,12 +1,8 @@
 <div align="center">
 <h3 align="center">TechTest Laravel Application</h3>
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="https://d15ywwv3do91l7.cloudfront.net/medium.webp" alt="Logo" width="80" height="80">
-  </a>  
-  <p align="center">
-    <br />
-    <a href="http://ec2-54-185-223-128.us-west-2.compute.amazonaws.com" target="_blank">View Demo</a>
-  </p>
+    <img src="https://d1hbpr09pwz0sk.cloudfront.net/logo_url/docupet-dd73cd96" alt="Logo" width="80" height="80">
+  </a>
 </div>
 
 <!-- ABOUT THE PROJECT -->
