@@ -16,6 +16,7 @@ use App\Entity\PetType;
 use App\Form\PetRegistrationType;
 use App\Service\Pet\BreedSearchService;
 use App\Service\Pet\BreedStateFactory;
+use App\Service\Pet\PetBreedResolverInterface;
 use App\Service\Pet\PetTypeResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -89,6 +90,7 @@ class PetRegistrationForm extends AbstractController
         private readonly PetTypeResolver $petTypeResolver,
         private readonly BreedStateFactory $breedStateFactory,
         private readonly BreedSearchService $breedSearchService,
+        private readonly PetBreedResolverInterface $petBreedResolver,
     ) {
     }
 
@@ -162,10 +164,12 @@ class PetRegistrationForm extends AbstractController
     public function setBreed(#[LiveArg('id')] string $id): void
     {
         $this->breedId = $id;
+        $this->formValues['breed'] = $id;
 
-        if ($breed = $this->em->getRepository(PetBreed::class)->find($id)) {
-            $this->breedSearch = $breed->getName();
-            $this->selectedBreedName = $breed->getName();
+        if ($breed = $this->petBreedResolver->byId($id)) {
+            $name = $breed->getName();
+            $this->breedSearch = $name;
+            $this->selectedBreedName = $name;
         }
 
         $this->filteredBreeds = [];
