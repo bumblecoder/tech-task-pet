@@ -86,8 +86,8 @@ class PetRegistrationForm extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly PetTypeResolver $petTypeResolver,
-        private readonly BreedStateFactory $breedStateFactory
-    ){
+        private readonly BreedStateFactory $breedStateFactory,
+    ) {
     }
 
     protected function instantiateForm(): FormInterface
@@ -113,11 +113,11 @@ class PetRegistrationForm extends AbstractController
 
         $state = $this->breedStateFactory->reset();
 
-        $this->breedId        = $state->breedId;
-        $this->breedSearch    = $state->breedSearch;
+        $this->breedId = $state->breedId;
+        $this->breedSearch = $state->breedSearch;
         $this->filteredBreeds = $state->filteredBreeds;
-        $this->breedChoice    = $state->breedChoice;
-        $this->breedMixText   = $state->breedMixText;
+        $this->breedChoice = $state->breedChoice;
+        $this->breedMixText = $state->breedMixText;
     }
 
     #[LiveAction]
