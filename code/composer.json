@@ -69,9 +69,13 @@
         "build-assets": [
             "bash -c 'if docker compose ps php-fpm &>/dev/null; then docker compose exec php-fpm php bin/console importmap:install && docker compose exec php-fpm php bin/console tailwind:build && docker compose exec php-fpm php bin/console asset-map:compile; else php bin/console importmap:install && php bin/console tailwind:build && php bin/console asset-map:compile; fi'"
         ],
+        "test": [
+            "bash -c 'php bin/console doctrine:database:create --env=test --if-not-exists && php bin/console doctrine:migrations:migrate --env=test -n && php bin/phpunit'"
+        ],
         "post-install-cmd": [
             "@auto-scripts",
-            "@build-assets"
+            "@build-assets",
+            "@test"
         ],
         "post-update-cmd": [
             "@auto-scripts"
