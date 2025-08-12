@@ -16,7 +16,6 @@ Ensure you have Docker and Docker Compose installed on your machine.
    ```sh
    git clone https://github.com/bumblecoder/tech-task.git
    cd tech-task
-   cp code/.env code/.env.local
    cp code/.env code/.env.local && \
    sed -i 's|^DATABASE_URL=.*|DATABASE_URL="mysqli://docupet:password@mysql:3306/docupet_db"|' code/.env.local
    ```
