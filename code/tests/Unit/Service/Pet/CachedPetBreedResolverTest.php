@@ -13,46 +13,63 @@ namespace App\Tests\Unit\Service\Pet;
 use App\Entity\PetBreed;
 use App\Service\Pet\CachedPetBreedResolver;
 use App\Service\Pet\PetBreedResolverInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final class CachedPetBreedResolverTest extends TestCase
 {
     /**
-     * @throws Exception
      * @throws InvalidArgumentException
+     * @throws ORMException
+     * @throws Exception
      */
-    public function testCachesEntityAndAvoidsSecondInnerCall(): void
+    public function testCachesPositiveExistenceAndReturnsManagedReference(): void
     {
-        $id = '42';
-        $breed = $this->createMock(PetBreed::class);
+        $id = '11111111-1111-1111-1111-111111111111';
+
         $inner = $this->createMock(PetBreedResolverInterface::class);
         $inner->expects(self::once())
             ->method('byId')
             ->with($id)
-            ->willReturn($breed);
+            ->willReturn($this->createStub(PetBreed::class));
 
         $cache = $this->fakeCache();
 
-        $resolver = new CachedPetBreedResolver($inner, $cache);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $ref1 = $this->createMock(PetBreed::class);
+        $ref2 = $this->createMock(PetBreed::class);
 
-        $first = $resolver->byId($id);
-        $second = $resolver->byId($id);
+        $em->expects(self::exactly(2))
+            ->method('getReference')
+            ->with(
+                PetBreed::class,
+                self::callback(fn($u) => $u instanceof Uuid && (string)$u === $id)
+            )
+            ->willReturnOnConsecutiveCalls($ref1, $ref2);
 
-        self::assertSame($breed, $first);
-        self::assertSame($breed, $second);
+        $resolver = new CachedPetBreedResolver($inner, $cache, $em);
+
+        $a = $resolver->byId($id);
+        $b = $resolver->byId($id);
+
+        self::assertSame($ref1, $a);
+        self::assertSame($ref2, $b);
     }
 
     /**
      * @throws Exception
      * @throws InvalidArgumentException
+     * @throws ORMException
      */
-    public function testCachesNullResult(): void
+    public function testCachesNegativeExistenceAndAlwaysReturnsNull(): void
     {
-        $id = '404';
+        $id = '22222222-2222-2222-2222-222222222222';
 
         $inner = $this->createMock(PetBreedResolverInterface::class);
         $inner->expects(self::once())
@@ -62,44 +79,13 @@ final class CachedPetBreedResolverTest extends TestCase
 
         $cache = $this->fakeCache();
 
-        $resolver = new CachedPetBreedResolver($inner, $cache);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::never())->method('getReference');
 
-        $first = $resolver->byId($id);
-        $second = $resolver->byId($id);
+        $resolver = new CachedPetBreedResolver($inner, $cache, $em);
 
-        self::assertNull($first);
-        self::assertNull($second);
-    }
-
-    /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     */
-    public function testDifferentKeysAreCachedSeparately(): void
-    {
-        $id1 = 'a';
-        $id2 = 'b';
-
-        $breed1 = $this->createMock(PetBreed::class);
-        $breed2 = $this->createMock(PetBreed::class);
-
-        $inner = $this->createMock(PetBreedResolverInterface::class);
-        $inner->expects(self::exactly(2))
-            ->method('byId')
-            ->willReturnMap([
-                [$id1, $breed1],
-                [$id2, $breed2],
-            ]);
-
-        $cache = $this->fakeCache();
-
-        $resolver = new CachedPetBreedResolver($inner, $cache);
-
-        self::assertSame($breed1, $resolver->byId($id1));
-        self::assertSame($breed2, $resolver->byId($id2));
-
-        self::assertSame($breed1, $resolver->byId($id1));
-        self::assertSame($breed2, $resolver->byId($id2));
+        self::assertNull($resolver->byId($id));
+        self::assertNull($resolver->byId($id));
     }
 
     /**
@@ -110,7 +96,6 @@ final class CachedPetBreedResolverTest extends TestCase
         $store = [];
 
         $cache = $this->createMock(CacheInterface::class);
-
         $cache->method('get')
             ->willReturnCallback(function (string $key, callable $callback) use (&$store) {
                 if (\array_key_exists($key, $store)) {
@@ -120,7 +105,9 @@ final class CachedPetBreedResolverTest extends TestCase
                 $item = $this->createStub(ItemInterface::class);
                 $item->method('expiresAfter')->willReturn($item);
                 $item->method('expiresAt')->willReturn($item);
-                $item->method('tag')->willReturn($item);
+                if (method_exists($item, 'tag')) {
+                    $item->method('tag')->willReturn($item);
+                }
 
                 $value = $callback($item);
                 $store[$key] = $value;

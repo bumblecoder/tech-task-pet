@@ -17,6 +17,7 @@ use App\Form\PetRegistrationType;
 use App\Service\Pet\BreedSearchService;
 use App\Service\Pet\BreedStateFactory;
 use App\Service\Pet\PetBreedResolverInterface;
+use App\Service\Pet\PetBreedSelectionApplier;
 use App\Service\Pet\PetTypeResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -91,6 +92,7 @@ class PetRegistrationForm extends AbstractController
         private readonly BreedStateFactory $breedStateFactory,
         private readonly BreedSearchService $breedSearchService,
         private readonly PetBreedResolverInterface $petBreedResolver,
+        private readonly PetBreedSelectionApplier $breedSelectionApplier
     ) {
     }
 
@@ -193,37 +195,8 @@ class PetRegistrationForm extends AbstractController
             return;
         }
 
-        if ($this->breedId) {
-            $breed = $this->em->getRepository(PetBreed::class)->find($this->breedId);
-            if (!$breed) {
-                $form->addError(new FormError('Selected breed is invalid.'));
-
-                return;
-            }
-            $pet->setBreed($breed);
-            $pet->setBreedOther(null);
-        } else {
-            $pet->setBreed(null);
-
-            $choice = $form->has('breedChoice') ? $form->get('breedChoice')->getData() : null; // 'unknown'|'mix'|null
-            $mixText = $form->has('breedOther') ? trim((string) $form->get('breedOther')->getData()) : '';
-
-            if (null === $choice || '' === $choice) {
-                $form->get('breedChoice')->addError(new FormError('Please choose one option.'));
-
-                return;
-            }
-
-            if ('mix' === $choice) {
-                if ('' === $mixText) {
-                    $form->get('breedOther')->addError(new FormError('Please specify the mix breed.'));
-
-                    return;
-                }
-                $pet->setBreedOther($mixText);
-            } else {
-                $pet->setBreedOther(null);
-            }
+        if (!$this->breedSelectionApplier->apply($pet, $this->breedId, $form)) {
+            return;
         }
 
         if ($this->dobKnown) {
