@@ -14,6 +14,8 @@ use App\Entity\Pet;
 use App\Entity\PetBreed;
 use App\Entity\PetType;
 use App\Form\PetRegistrationType;
+use App\Service\Pet\BreedStateFactory;
+use App\Service\Pet\PetTypeResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -30,10 +32,6 @@ class PetRegistrationForm extends AbstractController
 {
     use ComponentWithFormTrait;
     use DefaultActionTrait;
-
-    public function __construct(private EntityManagerInterface $em)
-    {
-    }
 
     #[LiveProp(writable: true)]
     public ?Pet $data = null;
@@ -85,30 +83,41 @@ class PetRegistrationForm extends AbstractController
     #[LiveProp(writable: true)]
     public bool $showSummary = false;
 
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly PetTypeResolver $petTypeResolver,
+        private readonly BreedStateFactory $breedStateFactory
+    ){
+    }
+
     protected function instantiateForm(): FormInterface
     {
         return $this->createForm(PetRegistrationType::class, new Pet());
     }
 
-    public function shouldSubmitFormOnRender(): bool
-    {
-        return !$this->disableSubmitOnRender;
-    }
-
     #[LiveAction]
     public function pickType(#[LiveArg] string $id): void
     {
-        $type = $this->em->getRepository(PetType::class)->find($id);
+        if ($this->type && method_exists($this->type, 'getId') && (string) $this->type->getId() === $id) {
+            return;
+        }
+
+        $type = $this->petTypeResolver->byId($id);
+
+        if (null === $type) {
+            return;
+        }
+
         $this->type = $type;
+        $this->formValues['type'] = $type->getId();
 
-        $this->getForm()->get('type')->setData($type);
+        $state = $this->breedStateFactory->reset();
 
-        $this->breedId = null;
-        $this->breedSearch = null;
-        $this->filteredBreeds = [];
-
-        $this->breedChoice = null;
-        $this->breedMixText = null;
+        $this->breedId        = $state->breedId;
+        $this->breedSearch    = $state->breedSearch;
+        $this->filteredBreeds = $state->filteredBreeds;
+        $this->breedChoice    = $state->breedChoice;
+        $this->breedMixText   = $state->breedMixText;
     }
 
     #[LiveAction]
