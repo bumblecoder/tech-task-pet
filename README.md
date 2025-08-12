@@ -1,7 +1,7 @@
 <div align="center">
 <h3 align="center">TechTest Laravel Application</h3>
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="https://d1hbpr09pwz0sk.cloudfront.net/logo_url/docupet-dd73cd96" alt="Logo" width="80" height="80">
+    <img src="https://ibb.co/vxNrtmgk" alt="Logo" width="80" height="80">
   </a>
 </div>
 
