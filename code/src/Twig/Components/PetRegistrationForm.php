@@ -19,6 +19,7 @@ use App\Service\Pet\DateParts;
 use App\Service\Pet\PetBreedResolverInterface;
 use App\Service\Pet\PetBreedSelectionApplier;
 use App\Service\Pet\PetDateApplier;
+use App\Service\Pet\PetSummaryBuilder;
 use App\Service\Pet\PetTypeResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -95,6 +96,7 @@ class PetRegistrationForm extends AbstractController
         private readonly PetBreedResolverInterface $petBreedResolver,
         private readonly PetBreedSelectionApplier $breedSelectionApplier,
         private readonly PetDateApplier $petDateApplier,
+        private readonly PetSummaryBuilder $petSummaryBuilder,
     ) {
     }
 
@@ -214,65 +216,58 @@ class PetRegistrationForm extends AbstractController
         $this->em->persist($pet);
         $this->em->flush();
 
-        $this->summary = [
-            'name' => $pet->getName() ?: '—',
-            'type' => $pet->getType()?->getName() ?: '—',
-            'breed' => $pet->getBreed()?->getName()
-                ?? ($pet->getBreedOther() ? 'Mix' : 'Unknown'),
-            'mix' => $pet->getBreedOther() ? 'Yes' : 'No',
-            'mixText' => $pet->getBreedOther() ?: null,
-            'gender' => $pet->getSex()?->name ?? '—',
-            'ageOrDob' => $pet->getDateOfBirth()
-                ? $pet->getDateOfBirth()->format('Y-m-d')
-                : ($pet->getApproximateAge() ? ('~' . $pet->getApproximateAge() . ' years') : '—'),
-            'dangerous' => $pet->isDangerous(),
-        ];
+        $this->summary = $this->petSummaryBuilder->build($pet);
 
         $this->showSummary = true;
         $this->disableSubmitOnRender = true;
 
         $this->resetForm();
-
-        $this->userSubmit = false;
-        $this->breedId = null;
-        $this->breedSearch = '';
-        $this->dobYear = $this->dobMonth = $this->dobDay = null;
-    }
-
-    #[LiveAction]
-    public function resetDobControls(): void
-    {
-        if ($this->dobKnown) {
-            $this->approximateAge = null;
-            if ($this->getForm()->has('approximateAge')) {
-                $this->getForm()->get('approximateAge')->setData(null);
-            }
-        } else {
-            $this->dobDay = null;
-            $this->dobMonth = null;
-            $this->dobYear = null;
-            if ($this->getForm()->has('dateOfBirth')) {
-                $this->getForm()->get('dateOfBirth')->setData(null);
-            }
-        }
+        $this->resetAfterSuccessfulSave();
     }
 
     #[LiveAction]
     public function addAnother(): void
     {
+        $this->hideSummary();
+        $this->resetForm();
+        $this->resetEntryState();
+    }
+
+    private function resetAfterSuccessfulSave(): void
+    {
+        $s = $this->breedStateFactory->reset();
+        $this->breedId = $s->breedId;
+        $this->breedSearch = $s->breedSearch;
+        $this->filteredBreeds = $s->filteredBreeds;
+        $this->breedChoice = $s->breedChoice;
+        $this->breedMixText = $s->breedMixText;
+
+        $this->userSubmit = false;
+        $this->dobYear = $this->dobMonth = $this->dobDay = null;
+    }
+
+    private function hideSummary(): void
+    {
         $this->showSummary = false;
         $this->summary = null;
         $this->disableSubmitOnRender = false;
+    }
 
-        $this->resetForm();
-        if (\method_exists($this, 'resetValidation')) {
-            $this->resetValidation();
+    private function resetEntryState(): void
+    {
+        if (isset($this->breedStateFactory)) {
+            $s = $this->breedStateFactory->reset();
+            $this->breedId      = $s->breedId;
+            $this->breedSearch  = $s->breedSearch;
+            $this->breedChoice  = $s->breedChoice;
+            $this->breedMixText = $s->breedMixText;
+        } else {
+            $this->breedId = null;
+            $this->breedSearch = '';
+            $this->breedChoice = null;
+            $this->breedMixText = null;
         }
 
-        $this->breedId = null;
-        $this->breedSearch = '';
-        $this->breedChoice = null;
-        $this->breedMixText = null;
         $this->dobYear = $this->dobMonth = $this->dobDay = null;
         $this->userSubmit = false;
     }
