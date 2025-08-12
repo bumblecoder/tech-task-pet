@@ -14,6 +14,7 @@ use App\Entity\Pet;
 use App\Entity\PetBreed;
 use App\Entity\PetType;
 use App\Form\PetRegistrationType;
+use App\Service\Pet\BreedSearchService;
 use App\Service\Pet\BreedStateFactory;
 use App\Service\Pet\PetTypeResolver;
 use Doctrine\ORM\EntityManagerInterface;
@@ -87,6 +88,7 @@ class PetRegistrationForm extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly PetTypeResolver $petTypeResolver,
         private readonly BreedStateFactory $breedStateFactory,
+        private readonly BreedSearchService $breedSearchService,
     ) {
     }
 
@@ -130,7 +132,15 @@ class PetRegistrationForm extends AbstractController
             $this->breedMixText = null;
         }
 
-        $type = $this->type ?? $this->getForm()->get('type')->getData();
+        $type = $this->type;
+
+        if (!$type) {
+            $typeId = $this->formValues['type'] ?? null;
+
+            if ($typeId) {
+                $type = $this->petTypeResolver->byId((string) $typeId);
+            }
+        }
 
         if (!$this->breedSearch || !$type instanceof PetType) {
             $this->filteredBreeds = [];
@@ -140,12 +150,7 @@ class PetRegistrationForm extends AbstractController
             return;
         }
 
-        $breeds = $this->em->getRepository(PetBreed::class)->findBySearch($type, $this->breedSearch);
-
-        $this->filteredBreeds = array_map(
-            fn (PetBreed $b) => ['id' => (string) $b->getId(), 'name' => $b->getName()],
-            $breeds ?? []
-        );
+        $this->filteredBreeds = $this->breedSearchService->search($type, $this->breedSearch);
 
         if (!empty($this->filteredBreeds)) {
             $this->breedChoice = null;
